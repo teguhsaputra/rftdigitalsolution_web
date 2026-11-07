@@ -10,6 +10,7 @@ const createSchema = z.object({
   titleEn: z.string().min(1),
   summary: z.string().min(1),
   details: z.array(z.string()),
+  priceFrom: z.number().int().positive().nullable().optional(),
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),
 });
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
         titleEn: data.titleEn,
         summary: data.summary,
         details: data.details,
+        priceFrom: data.priceFrom ?? null,
         sortOrder: data.sortOrder ?? 0,
         published: data.published ?? true,
       },

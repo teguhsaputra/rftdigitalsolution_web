@@ -26,11 +26,14 @@ export type ServiceItem = {
   titleEn: string;
   summary: string;
   details: string[];
+  /** Harga mulai dari (Rp); null = "Hubungi kami". */
+  priceFrom: number | null;
 };
 
 export const coreServices: ServiceItem[] = [
   {
     slug: 'website',
+    priceFrom: 2500000,
     title: 'Pembuatan Website',
     titleEn: 'Website Development',
     summary:
@@ -43,6 +46,7 @@ export const coreServices: ServiceItem[] = [
   },
   {
     slug: 'mobile-apps',
+    priceFrom: 15000000,
     title: 'Aplikasi Mobile',
     titleEn: 'Mobile Apps',
     summary:
@@ -55,6 +59,7 @@ export const coreServices: ServiceItem[] = [
   },
   {
     slug: 'seo',
+    priceFrom: 1500000,
     title: 'SEO Management',
     titleEn: 'SEO Management',
     summary:
@@ -67,6 +72,7 @@ export const coreServices: ServiceItem[] = [
   },
   {
     slug: 'branding',
+    priceFrom: 2000000,
     title: 'Branding',
     titleEn: 'Branding',
     summary:
@@ -79,6 +85,7 @@ export const coreServices: ServiceItem[] = [
   },
   {
     slug: 'social-media',
+    priceFrom: 1500000,
     title: 'Social Media',
     titleEn: 'Social Media',
     summary:

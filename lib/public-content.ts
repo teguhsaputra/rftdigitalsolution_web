@@ -52,6 +52,7 @@ export async function getPublicServices(): Promise<ServiceItem[]> {
       titleEn: r.titleEn,
       summary: r.summary,
       details: asStringArray(r.details),
+      priceFrom: r.priceFrom,
     }));
   } catch {
     return coreServices;

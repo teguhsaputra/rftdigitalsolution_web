@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { formatPriceFrom } from '@/lib/format';
 
 type Row = {
   id: string;
@@ -20,6 +21,7 @@ type Row = {
   slug: string;
   published: boolean;
   sortOrder: number;
+  priceFrom: number | null;
 };
 
 export function AdminServicesTable({ items }: { items: Row[] }) {
@@ -54,6 +56,7 @@ export function AdminServicesTable({ items }: { items: Row[] }) {
             <TableRow>
               <TableHead>Judul</TableHead>
               <TableHead>Slug</TableHead>
+              <TableHead>Harga</TableHead>
               <TableHead>Urutan</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Aksi</TableHead>
@@ -64,6 +67,7 @@ export function AdminServicesTable({ items }: { items: Row[] }) {
               <TableRow key={s.id}>
                 <TableCell className="font-medium">{s.title}</TableCell>
                 <TableCell className="text-muted-foreground">{s.slug}</TableCell>
+                <TableCell>{formatPriceFrom(s.priceFrom)}</TableCell>
                 <TableCell>{s.sortOrder}</TableCell>
                 <TableCell>{s.published ? 'Published' : 'Draft'}</TableCell>
                 <TableCell className="text-right">

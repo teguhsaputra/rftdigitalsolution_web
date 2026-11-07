@@ -10,6 +10,7 @@ const updateSchema = z.object({
   titleEn: z.string().min(1).optional(),
   summary: z.string().min(1).optional(),
   details: z.array(z.string()).optional(),
+  priceFrom: z.number().int().positive().nullable().optional(),
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),
 });
@@ -59,6 +60,7 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
         ...(data.titleEn !== undefined && { titleEn: data.titleEn }),
         ...(data.summary !== undefined && { summary: data.summary }),
         ...(data.details !== undefined && { details: data.details }),
+        ...(data.priceFrom !== undefined && { priceFrom: data.priceFrom }),
         ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
         ...(data.published !== undefined && { published: data.published }),
       },

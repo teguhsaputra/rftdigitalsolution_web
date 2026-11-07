@@ -14,6 +14,7 @@ export default async function AdminServicesPage() {
       slug: true,
       published: true,
       sortOrder: true,
+      priceFrom: true,
     },
   });
 

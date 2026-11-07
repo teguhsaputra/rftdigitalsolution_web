@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { formatPriceFrom, parsePriceInput } from '@/lib/format';
 
 const schema = z.object({
   slug: z.string().min(1, 'Slug wajib'),
@@ -23,6 +24,7 @@ const schema = z.object({
   titleEn: z.string().min(1, 'Judul EN wajib'),
   summary: z.string().min(1, 'Ringkasan wajib'),
   detailsText: z.string().min(1, 'Detail (minimal satu baris) wajib'),
+  priceFrom: z.string().optional(),
   sortOrder: z.string().optional(),
   published: z.boolean(),
 });
@@ -44,6 +46,7 @@ export function AdminServiceEditor({
     titleEn: string;
     summary: string;
     details: unknown;
+    priceFrom: number | null;
     sortOrder: number;
     published: boolean;
   };
@@ -65,6 +68,7 @@ export function AdminServiceEditor({
       titleEn: service?.titleEn ?? '',
       summary: service?.summary ?? '',
       detailsText: service ? detailsToText(service.details) : '',
+      priceFrom: service?.priceFrom != null ? String(service.priceFrom) : '',
       sortOrder: service != null ? String(service.sortOrder) : '0',
       published: service?.published ?? true,
     },
@@ -72,6 +76,7 @@ export function AdminServiceEditor({
 
   const title = watch('title');
   const published = watch('published');
+  const priceFromText = watch('priceFrom');
 
   useEffect(() => {
     if (!isEdit && title) {
@@ -95,6 +100,7 @@ export function AdminServiceEditor({
       titleEn: data.titleEn,
       summary: data.summary,
       details,
+      priceFrom: parsePriceInput(data.priceFrom),
       sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
       published: data.published,
     };
@@ -122,7 +128,7 @@ export function AdminServiceEditor({
         <CardHeader>
           <CardTitle>{isEdit ? 'Edit layanan' : 'Layanan baru'}</CardTitle>
           <CardDescription>
-            Satu kartu layanan = satu item di blok &quot;Apa yang kami kerjakan&quot; di beranda.
+            Satu layanan = satu kartu di section Layanan dan satu kartu di section Harga beranda.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -158,6 +164,14 @@ export function AdminServiceEditor({
             {errors.detailsText && (
               <p className="text-sm text-destructive">{errors.detailsText.message}</p>
             )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="priceFrom">Harga mulai dari (Rp)</Label>
+            <Input id="priceFrom" inputMode="numeric" placeholder="2.500.000" {...register('priceFrom')} />
+            <p className="text-xs text-muted-foreground">
+              Tampil di website: {formatPriceFrom(parsePriceInput(priceFromText))}. Kosongkan untuk
+              &quot;Hubungi kami&quot;.
+            </p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             <div className="grid gap-2">
