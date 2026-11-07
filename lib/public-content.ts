@@ -10,8 +10,7 @@ import {
   type ServiceItem,
   type TrustedPartnerItem,
 } from '@/lib/marketing-data';
-import { BRAND_LOGO_FALLBACK_SRC, BRAND_SETTINGS_ID } from '@/lib/brand';
-import { getBrandSettingsLogoUrl } from '@/lib/brand-settings-db';
+import { getBrandSettings } from '@/lib/brand-settings-db';
 import { normalizePublicUrlForBrowser } from '@/lib/s3';
 
 export const ABOUT_PAGE_ID = 'default';
@@ -115,8 +114,7 @@ export async function getPublicTrustedPartners(): Promise<TrustedPartnerItem[]> 
 }
 
 export async function getPublicBrandLogoUrl(): Promise<string> {
-  const logoUrl = await getBrandSettingsLogoUrl(BRAND_SETTINGS_ID);
-  return logoUrl ? normalizePublicUrlForBrowser(logoUrl) : BRAND_LOGO_FALLBACK_SRC;
+  return (await getBrandSettings()).logoUrl;
 }
 
 export async function getPublicCareers(): Promise<CareerOpening[]> {

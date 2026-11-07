@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
-import { BRAND_LOGO_FALLBACK_SRC, BRAND_SETTINGS_ID } from '@/lib/brand';
-import { getBrandSettingsLogoUrl, upsertBrandSettingsLogoUrl } from '@/lib/brand-settings-db';
+import { getBrandSettings, upsertBrandSettings } from '@/lib/brand-settings-db';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -21,8 +20,7 @@ async function requireAdmin() {
 export async function GET() {
   const deny = await requireAdmin();
   if (deny) return deny;
-  const logoUrl = await getBrandSettingsLogoUrl(BRAND_SETTINGS_ID);
-  return NextResponse.json({ logoUrl: logoUrl ?? BRAND_LOGO_FALLBACK_SRC });
+  return NextResponse.json(await getBrandSettings());
 }
 
 export async function PUT(req: NextRequest) {
@@ -30,7 +28,8 @@ export async function PUT(req: NextRequest) {
   if (deny) return deny;
   try {
     const data = schema.parse(await req.json());
-    const row = await upsertBrandSettingsLogoUrl(BRAND_SETTINGS_ID, data.logoUrl);
+    await upsertBrandSettings({ logoUrl: data.logoUrl });
+    const row = await getBrandSettings();
     // Ensure brand logo changes reflect everywhere (layout + page)
     revalidatePath('/', 'layout');
     revalidatePath('/', 'page');

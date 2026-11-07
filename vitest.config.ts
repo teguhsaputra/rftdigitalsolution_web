@@ -5,6 +5,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['lib/**/*.test.ts'],
+    // lib/env.ts treats a "dummy" DATABASE_URL as build-time and fills placeholder values.
+    env: { DATABASE_URL: 'postgresql://user:pass@localhost:5432/dummy' },
   },
   resolve: {
     alias: { '@': path.resolve(__dirname) },

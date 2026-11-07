@@ -1,28 +1,70 @@
 import { prisma } from '@/lib/prisma';
 import { normalizePublicUrlForBrowser } from '@/lib/s3';
+import {
+  BRAND_LOGO_FALLBACK_SRC,
+  BRAND_MARK_FALLBACK_SRC,
+  BRAND_SETTINGS_ID,
+  DEFAULT_CONTACT_EMAIL,
+  DEFAULT_WHATSAPP_MESSAGE,
+  LEGACY_LOGO_SRCS,
+} from '@/lib/brand';
 
-export type BrandSettingsRow = { id: string; logoUrl: string };
+export type BrandSettingsPublic = {
+  logoUrl: string;
+  logoMarkUrl: string;
+  whatsappNumber: string | null;
+  whatsappMessage: string;
+  contactEmail: string;
+};
 
-export async function getBrandSettingsLogoUrl(id: string): Promise<string | null> {
-  const rows = await prisma.$queryRaw<BrandSettingsRow[]>`
-    SELECT "id", "logoUrl"
-    FROM "BrandSettings"
-    WHERE "id" = ${id}
-    LIMIT 1
-  `;
-  const url = rows[0]?.logoUrl ?? null;
-  return url ? normalizePublicUrlForBrowser(url) : null;
+type BrandSettingsInput = {
+  logoUrl?: string | null;
+  logoMarkUrl?: string | null;
+  whatsappNumber?: string | null;
+  whatsappMessage?: string | null;
+  contactEmail?: string | null;
+};
+
+function clean(v: string | null | undefined): string | null {
+  const t = v?.trim();
+  return t ? t : null;
 }
 
-export async function upsertBrandSettingsLogoUrl(id: string, logoUrl: string) {
-  // Upsert without requiring regenerated Prisma model client
-  const rows = await prisma.$queryRaw<BrandSettingsRow[]>`
-    INSERT INTO "BrandSettings" ("id", "logoUrl", "createdAt", "updatedAt")
-    VALUES (${id}, ${logoUrl}, NOW(), NOW())
-    ON CONFLICT ("id")
-    DO UPDATE SET "logoUrl" = EXCLUDED."logoUrl", "updatedAt" = NOW()
-    RETURNING "id", "logoUrl"
-  `;
-  return rows[0];
+function imageOr(v: string | null | undefined, fallback: string): string {
+  const t = clean(v);
+  if (!t || LEGACY_LOGO_SRCS.includes(t)) return fallback;
+  return normalizePublicUrlForBrowser(t);
 }
 
+/** Pure: gabungkan baris DB (boleh null) dengan default brand. */
+export function resolveBrandSettings(row: BrandSettingsInput | null): BrandSettingsPublic {
+  return {
+    logoUrl: imageOr(row?.logoUrl, BRAND_LOGO_FALLBACK_SRC),
+    logoMarkUrl: imageOr(row?.logoMarkUrl, BRAND_MARK_FALLBACK_SRC),
+    whatsappNumber: clean(row?.whatsappNumber),
+    whatsappMessage: clean(row?.whatsappMessage) ?? DEFAULT_WHATSAPP_MESSAGE,
+    contactEmail: clean(row?.contactEmail) ?? DEFAULT_CONTACT_EMAIL,
+  };
+}
+
+export async function getBrandSettings(): Promise<BrandSettingsPublic> {
+  try {
+    const row = await prisma.brandSettings.findUnique({ where: { id: BRAND_SETTINGS_ID } });
+    return resolveBrandSettings(row);
+  } catch {
+    return resolveBrandSettings(null);
+  }
+}
+
+/** Simpan field yang dikirim; string kosong disimpan sebagai null. */
+export async function upsertBrandSettings(data: BrandSettingsInput): Promise<void> {
+  const fields: BrandSettingsInput = {};
+  for (const key of Object.keys(data) as (keyof BrandSettingsInput)[]) {
+    if (data[key] !== undefined) fields[key] = clean(data[key]);
+  }
+  await prisma.brandSettings.upsert({
+    where: { id: BRAND_SETTINGS_ID },
+    create: { id: BRAND_SETTINGS_ID, ...fields },
+    update: fields,
+  });
+}

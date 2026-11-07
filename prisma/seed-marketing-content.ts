@@ -6,7 +6,7 @@ import {
   portfolioProjects,
 } from '../lib/marketing-data';
 import { ABOUT_PAGE_ID } from '../lib/public-content';
-import { BRAND_LOGO_FALLBACK_SRC, BRAND_SETTINGS_ID } from '../lib/brand';
+import { BRAND_SETTINGS_ID, DEFAULT_WHATSAPP_MESSAGE, LEGACY_LOGO_SRCS } from '../lib/brand';
 
 /**
  * Seed / upsert: About (satu dokumen), Layanan, Portfolio, Karier.
@@ -15,8 +15,13 @@ import { BRAND_LOGO_FALLBACK_SRC, BRAND_SETTINGS_ID } from '../lib/brand';
 export async function seedMarketingContent(prisma: PrismaClient) {
   await prisma.brandSettings.upsert({
     where: { id: BRAND_SETTINGS_ID },
-    create: { id: BRAND_SETTINGS_ID, logoUrl: BRAND_LOGO_FALLBACK_SRC },
+    create: { id: BRAND_SETTINGS_ID, logoUrl: null, whatsappMessage: DEFAULT_WHATSAPP_MESSAGE },
     update: {},
+  });
+  // Seed lama menyimpan logo /brand-logo.svg — kosongkan supaya logo baru (fallback) yang tampil.
+  await prisma.brandSettings.updateMany({
+    where: { id: BRAND_SETTINGS_ID, logoUrl: { in: LEGACY_LOGO_SRCS } },
+    data: { logoUrl: null },
   });
 
   await prisma.aboutPage.upsert({

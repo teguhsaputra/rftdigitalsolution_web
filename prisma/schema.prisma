@@ -44,6 +44,7 @@ model Service {
   titleEn   String
   summary   String   @db.Text
   details   Json
+  priceFrom Int?
   sortOrder Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -82,8 +83,12 @@ model TrustedPartner {
 }
 
 model BrandSettings {
-  id        String   @id
-  logoUrl   String
+  id              String   @id
+  logoUrl         String?
+  logoMarkUrl     String?
+  whatsappNumber  String?
+  whatsappMessage String?
+  contactEmail    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

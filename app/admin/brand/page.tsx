@@ -1,10 +1,8 @@
 import { AdminBrandEditor } from '@/components/admin-brand-editor';
-import { BRAND_LOGO_FALLBACK_SRC, BRAND_SETTINGS_ID } from '@/lib/brand';
-import { getBrandSettingsLogoUrl } from '@/lib/brand-settings-db';
+import { getBrandSettings } from '@/lib/brand-settings-db';
 
 export default async function AdminBrandPage() {
-  const logoUrl = await getBrandSettingsLogoUrl(BRAND_SETTINGS_ID);
-  const initialLogoUrl = logoUrl ?? BRAND_LOGO_FALLBACK_SRC;
+  const initialLogoUrl = (await getBrandSettings()).logoUrl;
 
   return (
     <div className="space-y-8">
