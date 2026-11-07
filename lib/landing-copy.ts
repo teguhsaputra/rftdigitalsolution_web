@@ -6,7 +6,7 @@
 export const announcement = {
   label: 'KONSULTASI GRATIS',
   highlight: 'Website, aplikasi, SEO & branding',
-  rest: 'dari brand vision sampai virtual experience',
+  rest: 'satu tim, dari desain sampai rilis',
 };
 
 export const navLinks = [
@@ -19,24 +19,22 @@ export const navLinks = [
 ] as const;
 
 export const hero = {
-  notification: {
-    title: 'Pesan baru masuk',
-    time: 'barusan',
-    text: 'Halo RFT, website kami butuh dirombak. Bisa konsultasi minggu ini?',
-  },
+  /** Chip kepercayaan di atas judul — diisi otomatis dari daftar mitra. */
+  trustTitle: (count: number) => `Dipercaya ${count}+ klien`,
+  trustText: (names: string[]) => `${names.join(', ')}, dan lainnya`,
   lineMuted: 'Website yang',
   lineStruck: 'cuma pajangan',
   lineMain: 'jadi mesin',
   lineAccent: 'penjualan',
-  lead: 'Partner digital yang mikirin bisnis Anda, bukan cuma ngoding.',
-  body: 'Dari website, aplikasi, SEO, sampai branding dan media sosial — dikerjakan satu tim, dengan target bisnis Anda sebagai patokan.',
+  lead: 'Website, aplikasi, SEO, branding, dan media sosial — dikerjakan satu tim.',
+  body: 'Target bisnis Anda jadi patokan kami, dari diskusi pertama sampai project live dan terus berkembang.',
   primaryCta: 'Chat WhatsApp',
   secondaryCta: 'Lihat portofolio',
   reassurance: 'Konsultasi gratis, tanpa kewajiban. Kami balas di jam kerja.',
 };
 
 export const statement = {
-  lineOne: 'WEBSITE ITU MUDAH.',
+  lineOne: 'BANYAK YANG BISA BIKIN WEBSITE.',
   lineTwo: 'YANG MENJUAL ITU BEDA.',
   sub: 'BIAR RFT YANG MERANCANG',
 };
@@ -95,12 +93,14 @@ export const aboutHeading = {
   eyebrow: 'Tentang RFT',
 };
 
-// TODO(owner): ganti dengan angka asli.
-export const stats = [
-  { value: '5', unit: 'LAYANAN', text: 'dikerjakan tim in-house' },
-  { value: '20+', unit: 'PROJECT', text: 'dari F&B sampai EdTech' },
-  { value: '1', unit: 'TIM', text: 'dari desain sampai rilis' },
-];
+/** Baris angka di section Tentang — dihitung dari data mitra, portofolio, dan layanan. */
+export function buildStats(counts: { clients: number; projects: number; services: number }) {
+  return [
+    { value: `${counts.clients}+`, unit: 'KLIEN', text: 'dari pendidikan, F&B, sampai florist' },
+    { value: `${counts.projects}`, unit: 'PROJECT', text: 'web, aplikasi, dan media sosial' },
+    { value: `${counts.services}`, unit: 'LAYANAN', text: 'dikerjakan satu tim' },
+  ];
+}
 
 export const careersHeading = {
   eyebrow: 'Karier',

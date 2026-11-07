@@ -18,7 +18,7 @@ describe('server-rendered landing markup', () => {
   });
 
   it('hero headline and CTA are visible without JavaScript', () => {
-    const html = renderToString(<HeroSection brand={brand} projects={[]} />);
+    const html = renderToString(<HeroSection brand={brand} projects={[]} partners={[]} />);
     expect(html).toContain('wa.me/6281234567890');
     expect(html).not.toMatch(/opacity:\s*0/);
     expect(html).not.toContain('reveal');
@@ -37,4 +37,21 @@ it('collapsed service details are hidden from screen readers and linked to their
   const html = renderToString(<ServicesCarousel services={services} />);
   expect(html).toMatch(/<ul[^>]*id="layanan-detail-web"[^>]*aria-hidden="true"|<ul[^>]*aria-hidden="true"[^>]*id="layanan-detail-web"/);
   expect(html).toContain('aria-controls="layanan-detail-web"');
+});
+
+it('hero trust chip names real partners instead of a fake chat notification', () => {
+  const partners = ['A', 'B', 'C', 'D'].map((name) => ({ name, imageUrl: null }));
+  const html = renderToString(<HeroSection brand={brand} projects={[]} partners={partners} />);
+  expect(html).toContain('Dipercaya 4+ klien');
+  expect(html).toContain('A, B, C, dan lainnya');
+  expect(html).not.toContain('Pesan baru masuk');
+});
+
+it('partner marquee repeats logos so one loop is wider than the screen (no gap)', async () => {
+  const { PartnersMarquee } = await import('@/components/landing/partners-marquee');
+  const partners = Array.from({ length: 10 }, (_, i) => ({ name: `P${i}`, imageUrl: `/p${i}.webp` }));
+  const html = renderToString(<PartnersMarquee partners={partners} />);
+  // 2 salinan × minimal 24 logo
+  expect((html.match(/<button/g) ?? []).length).toBeGreaterThanOrEqual(48);
+  expect(html).toContain('grayscale');
 });

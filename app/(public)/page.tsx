@@ -11,6 +11,7 @@ import { CareersSection } from '@/components/landing/careers-section';
 import { BlogPreview } from '@/components/landing/blog-preview';
 import { FaqSection } from '@/components/landing/faq-section';
 import { getBrandSettings } from '@/lib/brand-settings-db';
+import { buildStats } from '@/lib/landing-copy';
 import { getPublishedPostSummaries } from '@/lib/blog-public';
 import {
   getPublicAbout,
@@ -34,7 +35,7 @@ export default async function Home() {
 
   return (
     <>
-      <HeroSection brand={brand} projects={projects} />
+      <HeroSection brand={brand} projects={projects} partners={partners} />
       <ServiceMarquee services={services} />
       <PartnersMarquee partners={partners} />
       <StatementSection />
@@ -42,7 +43,14 @@ export default async function Home() {
       <PortfolioGallery projects={projects} services={services} />
       <ProcessSteps />
       <PricingCards services={services} brand={brand} />
-      <AboutSection about={about} />
+      <AboutSection
+        about={about}
+        stats={buildStats({
+          clients: partners.length,
+          projects: projects.length,
+          services: services.length,
+        })}
+      />
       <CareersSection careers={careers} brand={brand} />
       <BlogPreview posts={posts} />
       <FaqSection />

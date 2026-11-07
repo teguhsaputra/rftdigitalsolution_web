@@ -30,3 +30,13 @@ it('rejects prices that do not fit the database column with a readable message',
   expect(r.error?.issues[0].message).toBe('Harga terlalu besar');
   expect(priceFromSchema.safeParse(null).success).toBe(true);
 });
+
+import { buildStats } from '@/lib/landing-copy';
+
+it('stats are derived from the real data counts', () => {
+  expect(buildStats({ clients: 10, projects: 11, services: 5 }).map((s) => `${s.value} ${s.unit}`)).toEqual([
+    '10+ KLIEN',
+    '11 PROJECT',
+    '5 LAYANAN',
+  ]);
+});

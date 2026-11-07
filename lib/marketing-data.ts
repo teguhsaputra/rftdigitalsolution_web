@@ -41,7 +41,7 @@ export const coreServices: ServiceItem[] = [
     title: 'Pembuatan Website',
     titleEn: 'Website Development',
     summary:
-      'Mau company profile, toko online, atau landing page yang converting? Kami kerjakan dari nol pakai teknologi terkini — hasilnya cepat, aman, dan enak dilihat di semua device.',
+      'Mau company profile, toko online, atau landing page yang benar-benar mendatangkan pelanggan? Kami kerjakan dari nol pakai teknologi terkini — hasilnya cepat, aman, dan enak dilihat di semua device.',
     details: [
       'Desain layout & struktur konten yang pas untuk bisnis Anda',
       'Dibangun pakai Next.js & stack modern, responsif di semua layar',
@@ -82,9 +82,9 @@ export const coreServices: ServiceItem[] = [
     summary:
       'Identitas visual yang konsisten bikin bisnis Anda lebih mudah diingat. Mulai dari logo, warna, tipografi, sampai guideline lengkap.',
     details: [
-      'Desain logo, palet warna, & tipografi yang cohesive',
+      'Desain logo, palet warna, & tipografi yang selaras',
       'Aset visual untuk digital dan cetak',
-      'Brand story & positioning yang relatable',
+      'Brand story & positioning yang mudah diingat audiens',
     ],
   },
   {
@@ -97,7 +97,7 @@ export const coreServices: ServiceItem[] = [
     details: [
       'Content pillar & ide konten kreatif tiap bulan',
       'Manajemen komunitas & engagement',
-      'Setup iklan + optimasi biar budget nggak boncos',
+      'Setup iklan + optimasi supaya budget iklan tidak terbuang',
     ],
   },
 ];
@@ -237,9 +237,9 @@ export const portfolioProjects: PortfolioItem[] = [
 export const aboutContent = {
   headline: 'Partner digital yang mikirin bisnis Anda, bukan cuma ngoding',
   intro:
-    `${agencyName} fokus di lima hal: bikin Website, develop Aplikasi Mobile, kelola SEO, Branding, dan Social Media. Klien kami mulai dari UMKM, startup, sampai perusahaan — semuanya kami dampingi dari awal diskusi sampai project jalan.`,
+    `${agencyName} fokus di lima hal: pembuatan website, aplikasi mobile, SEO, branding, dan media sosial. Klien kami mulai dari UMKM, institusi pendidikan, startup, sampai perusahaan — semuanya kami dampingi dari diskusi pertama sampai project berjalan.`,
   body: [
-    'Tim kami gabungin skill desain, engineering, dan growth marketing. Jadi setiap hal yang kami deliver bukan cuma tampil bagus, tapi benar-benar bantu konversi dan operasional Anda.',
+    'Tim kami menggabungkan desain, engineering, dan digital marketing. Hasilnya bukan cuma tampil bagus, tapi benar-benar membantu penjualan dan operasional Anda.',
     'Kami selalu transparan soal scope, timeline, dan cara kerja. Setiap project dimulai dari ngobrol soal bisnis Anda — bukan langsung lempar template.',
   ],
   values: [

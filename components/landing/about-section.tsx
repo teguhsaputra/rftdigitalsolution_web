@@ -1,5 +1,5 @@
 import type { AboutPublic } from '@/lib/public-content';
-import { aboutHeading, stats } from '@/lib/landing-copy';
+import { aboutHeading } from '@/lib/landing-copy';
 import { Eyebrow, Reveal } from '@/components/landing/reveal';
 
 /** Kata-kata terakhir judul jadi aksen serif (mis. "…bukan cuma *ngoding*"). */
@@ -9,7 +9,13 @@ function splitHeadline(headline: string): [string, string] {
   return [words.slice(0, -2).join(' '), words.slice(-2).join(' ')];
 }
 
-export function AboutSection({ about }: { about: AboutPublic }) {
+export function AboutSection({
+  about,
+  stats,
+}: {
+  about: AboutPublic;
+  stats: { value: string; unit: string; text: string }[];
+}) {
   const [main, accent] = splitHeadline(about.headline);
 
   return (

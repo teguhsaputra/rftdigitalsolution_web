@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import { ArrowDown, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ArrowDown, BadgeCheck, ShieldCheck } from 'lucide-react';
 import type { BrandSettingsPublic } from '@/lib/brand-settings-db';
-import type { PortfolioItem } from '@/lib/marketing-data';
+import type { PortfolioItem, TrustedPartnerItem } from '@/lib/marketing-data';
 import { hero } from '@/lib/landing-copy';
 import { ContactButton } from '@/components/landing/contact-button';
 
@@ -51,11 +51,14 @@ function FloatingCard({ project, slot }: { project: PortfolioItem; slot: string 
 export function HeroSection({
   brand,
   projects,
+  partners,
 }: {
   brand: BrandSettingsPublic;
   projects: PortfolioItem[];
+  partners: TrustedPartnerItem[];
 }) {
   const floating = projects.slice(0, floatSlots.length);
+  const showTrust = partners.length >= 3;
 
   return (
     <section
@@ -71,20 +74,24 @@ export function HeroSection({
       ))}
 
       <div className="relative mx-auto max-w-4xl motion-safe:animate-[hero-in_0.7s_cubic-bezier(0.22,1,0.36,1)_both]">
-        <div className="mx-auto mb-8 flex w-fit max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-left backdrop-blur">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-[#09090b]">
-            <MessageCircle className="h-4 w-4" aria-hidden />
-          </span>
-          <span className="min-w-0">
-            <span className="flex items-center gap-2 text-xs font-bold text-white">
-              {hero.notification.title}
-              <span className="font-medium text-zinc-500">{hero.notification.time}</span>
+        {showTrust && (
+          <a
+            href="#portofolio"
+            className="mx-auto mb-8 flex w-fit max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-left backdrop-blur transition-colors hover:border-white/20"
+          >
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-[#09090b]">
+              <BadgeCheck className="h-4 w-4" aria-hidden />
             </span>
-            <span className="block truncate text-[11px] text-zinc-400">
-              {hero.notification.text}
+            <span className="min-w-0">
+              <span className="block text-xs font-bold text-white">
+                {hero.trustTitle(partners.length)}
+              </span>
+              <span className="block truncate text-[11px] text-zinc-400">
+                {hero.trustText(partners.slice(0, 3).map((p) => p.name))}
+              </span>
             </span>
-          </span>
-        </div>
+          </a>
+        )}
         <h1 className="heading-display text-[clamp(2.75rem,8.5vw,6rem)] text-white">
           <span className="text-zinc-300">{hero.lineMuted}</span>
           <br />
