@@ -25,21 +25,24 @@ const schema = z.object({
   focus: z.string().min(1, 'Fokus wajib'),
   description: z.string().min(1, 'Deskripsi wajib'),
   image: z.string().optional(),
-  servicesText: z.string().min(1, 'Layanan terkait wajib'),
+  services: z.array(z.string()).min(1, 'Pilih minimal satu layanan'),
   sortOrder: z.string().optional(),
   published: z.boolean(),
 });
 
 type PortfolioFormValues = z.infer<typeof schema>;
 
-function servicesToText(services: unknown): string {
-  if (!Array.isArray(services)) return '';
-  return services.filter((x): x is string => typeof x === 'string').join('\n');
+function toStringArray(services: unknown): string[] {
+  if (!Array.isArray(services)) return [];
+  return services.filter((x): x is string => typeof x === 'string');
 }
 
 export function AdminPortfolioEditor({
   project,
+  serviceOptions,
 }: {
+  /** Judul layanan yang tersedia (checklist). */
+  serviceOptions: string[];
   project?: {
     id: string;
     slug: string;
@@ -71,7 +74,7 @@ export function AdminPortfolioEditor({
       focus: project?.focus ?? '',
       description: project?.description ?? '',
       image: project?.image ?? '',
-      servicesText: project ? servicesToText(project.services) : '',
+      services: project ? toStringArray(project.services) : [],
       sortOrder: project != null ? String(project.sortOrder) : '0',
       published: project?.published ?? true,
     },
@@ -80,6 +83,18 @@ export function AdminPortfolioEditor({
   const title = watch('title');
   const published = watch('published');
   const image = watch('image');
+  const selectedServices = watch('services');
+  // Tag lama yang tidak ada di daftar layanan tetap ditampilkan agar tidak hilang diam-diam.
+  const allServiceOptions = [
+    ...serviceOptions,
+    ...toStringArray(project?.services).filter((s) => !serviceOptions.includes(s)),
+  ];
+  const toggleService = (name: string, checked: boolean) => {
+    const next = checked
+      ? [...selectedServices, name]
+      : selectedServices.filter((s) => s !== name);
+    setValue('services', next, { shouldValidate: true });
+  };
 
   useEffect(() => {
     if (!isEdit && title) {
@@ -92,10 +107,7 @@ export function AdminPortfolioEditor({
   }, [title, isEdit, setValue]);
 
   const onSubmit = async (data: PortfolioFormValues) => {
-    const services = data.servicesText
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean);
+    const services = data.services;
     const sortOrder = parseInt(data.sortOrder ?? '0', 10);
     const img = data.image?.trim();
     const payload = {
@@ -179,10 +191,22 @@ export function AdminPortfolioEditor({
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="servicesText">Tag layanan (satu baris = satu tag)</Label>
-            <Textarea id="servicesText" rows={3} {...register('servicesText')} />
-            {errors.servicesText && (
-              <p className="text-sm text-destructive">{errors.servicesText.message}</p>
+            <Label>Layanan yang dikerjakan</Label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {allServiceOptions.map((name) => (
+                <label key={name} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={selectedServices.includes(name)}
+                    onChange={(e) => toggleService(name, e.target.checked)}
+                  />
+                  {name}
+                </label>
+              ))}
+            </div>
+            {errors.services && (
+              <p className="text-sm text-destructive">{errors.services.message}</p>
             )}
           </div>
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">

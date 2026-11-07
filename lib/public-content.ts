@@ -118,6 +118,20 @@ export async function getPublicBrandLogoUrl(): Promise<string> {
   return (await getBrandSettings()).logoUrl;
 }
 
+/** Judul semua layanan (termasuk draft) untuk checklist di editor portofolio admin. */
+export async function getServiceTitleOptions(): Promise<string[]> {
+  try {
+    const rows = await prisma.service.findMany({
+      select: { title: true },
+      orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
+    });
+    if (rows.length > 0) return rows.map((r) => r.title);
+  } catch {
+    // DB belum siap — pakai daftar bawaan.
+  }
+  return coreServices.map((s) => s.title);
+}
+
 export async function getPublicCareers(): Promise<CareerOpening[]> {
   try {
     const rows = await prisma.careerOpening.findMany({
