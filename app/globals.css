@@ -132,6 +132,8 @@
 
   body {
     @apply bg-background text-foreground;
+    /* clip (bukan hidden) supaya navbar sticky tetap jalan */
+    overflow-x: clip;
   }
 
   a[href],

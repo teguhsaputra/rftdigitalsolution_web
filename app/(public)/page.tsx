@@ -1,31 +1,30 @@
-import { HomeSections } from '@/components/home-sections';
-import { getPublishedPostSummaries } from '@/lib/blog-public';
+import { HeroSection } from '@/components/landing/hero-section';
+import { ServiceMarquee } from '@/components/landing/service-marquee';
+import { PartnersMarquee } from '@/components/landing/partners-marquee';
+import { StatementSection } from '@/components/landing/statement-section';
+import { ServicesCarousel } from '@/components/landing/services-carousel';
+import { getBrandSettings } from '@/lib/brand-settings-db';
 import {
-  getPublicAbout,
-  getPublicBrandLogoUrl,
   getPublicPortfolio,
   getPublicServices,
   getPublicTrustedPartners,
 } from '@/lib/public-content';
 
 export default async function Home() {
-  const [previewPosts, services, projects, about, trustedPartners, brandLogoUrl] = await Promise.all([
-    getPublishedPostSummaries({ take: 6 }),
+  const [brand, services, projects, partners] = await Promise.all([
+    getBrandSettings(),
     getPublicServices(),
     getPublicPortfolio(),
-    getPublicAbout(),
     getPublicTrustedPartners(),
-    getPublicBrandLogoUrl(),
   ]);
 
   return (
-    <HomeSections
-      trustedPartners={trustedPartners}
-      services={services}
-      projects={projects}
-      about={about}
-      previewPosts={previewPosts}
-      brandLogoUrl={brandLogoUrl}
-    />
+    <>
+      <HeroSection brand={brand} projects={projects} />
+      <ServiceMarquee services={services} />
+      <PartnersMarquee partners={partners} />
+      <StatementSection />
+      <ServicesCarousel services={services} />
+    </>
   );
 }
