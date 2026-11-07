@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { invalidateBlogCaches } from "@/lib/cache";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { imageRefSchema } from "@/lib/image-ref";
 
 const postSchema = z.object({
   title: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
   content: z.string().min(1).optional(),
-  image: z.string().url().optional().or(z.literal("")),
+  image: imageRefSchema.optional(),
   published: z.boolean().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),

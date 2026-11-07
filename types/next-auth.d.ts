@@ -9,19 +9,14 @@ declare module 'next-auth' {
     user: {
       id: string;
       email?: string | null;
+      name?: string | null;
       role?: string;
     };
-    accessToken?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
     role?: string;
-    accessToken?: string;
-    idToken?: string;
-    refreshToken?: string;
-    expiresAt?: number;
   }
 }
-

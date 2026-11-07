@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { requireAdminSession } from '@/lib/require-admin';
 import { prisma } from '@/lib/prisma';
 import { invalidateBlogCaches } from '@/lib/cache';
 import { z } from 'zod';
+import { imageRefSchema } from '@/lib/image-ref';
 
 const postSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
   content: z.string().min(1),
-  image: z.string().url().optional().or(z.literal('')),
+  image: imageRefSchema.optional(),
   published: z.boolean().default(false),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -17,11 +18,8 @@ const postSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { response } = await requireAdminSession();
+  if (response) return response;
 
   try {
     const body = await req.json();

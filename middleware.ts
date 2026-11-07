@@ -1,5 +1,10 @@
-import { auth } from './auth';
+import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
+import { authConfig } from './auth.config';
+
+// Instance ringan tanpa database: hanya membaca cookie sesi.
+// Pemeriksaan akun aktif dilakukan di layout admin & API (lewat `auth()` di auth.ts).
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -21,4 +26,3 @@ export default auth((req) => {
 export const config = {
   matcher: ['/admin', '/admin/:path*'],
 };
-

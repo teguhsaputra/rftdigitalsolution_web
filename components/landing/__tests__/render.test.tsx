@@ -73,3 +73,10 @@ it('navbar has no Karier link', async () => {
   expect(html).not.toContain('#karier');
   expect(html).toContain('/#portofolio');
 });
+
+it('image URL field accepts site-relative paths (browser validation must not block admin forms)', async () => {
+  const { ImageUpload } = await import('@/components/image-upload');
+  const html = renderToString(<ImageUpload value="/portfolio/x.webp" onChange={() => {}} />);
+  expect(html).toContain('value="/portfolio/x.webp"');
+  expect(html).not.toContain('type="url"');
+});

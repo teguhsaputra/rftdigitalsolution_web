@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { imageRefSchema } from "@/lib/image-ref";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TiptapEditor } from "@/components/tiptap-editor";
@@ -28,7 +29,7 @@ const postSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   content: z.string().min(1, "Content is required"),
-  image: z.string().url().optional().or(z.literal("")),
+  image: imageRefSchema.optional(),
   published: z.boolean(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),

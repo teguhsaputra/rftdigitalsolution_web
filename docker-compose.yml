@@ -6,23 +6,24 @@
 #   8092 → Dragonfly (6379)  | native_rft_cache
 #   8093 → MinIO S3 (9000)    | native_rft_minio
 #   8094 → MinIO Console (9001)
-#   8095 → Keycloak (8080)
 # Postgres tidak di-publish (hanya jaringan internal).
 # Nginx Proxy Manager: upstream ke IP host + port di atas (atau hostname Docker di global-net).
 #
 # Domain (HTTPS di reverse proxy → container):
-#   rftdigitalsolution.com | s3.* | s3-ui.* | keycloak.* | dragonfly.*
-# Lihat .env untuk KEYCLOAK_PUBLIC_HOST, MINIO_SERVER_URL, MINIO_BROWSER_REDIRECT_URL.
+#   rftdigitalsolution.com | s3.* | s3-ui.* | dragonfly.*
+# Lihat .env untuk MINIO_SERVER_URL, MINIO_BROWSER_REDIRECT_URL.
 #
 # Jaringan:
 # - native_rft_network: semua service (komunikasi internal).
-# - global-net: reverse proxy / app lain yang perlu upstream ke web, Keycloak, MinIO, Dragonfly.
+# - global-net: reverse proxy / app lain yang perlu upstream ke web, MinIO, Dragonfly.
 #   Postgres tetap hanya native_rft_network.
 #
 # Skema DB pertama kali / setelah ubah schema Prisma (dari folder project di server):
 #   docker compose --profile tools run --rm prisma-setup
 # Lalu isi data (opsional):
 #   docker compose --profile tools run --rm prisma-setup sh -c "npm ci && npm run db:seed && npm run db:seed:marketing"
+# Buat akun admin pertama (login di /login):
+#   docker compose --profile tools run --rm prisma-setup sh -c "npm ci && npm run admin:create -- --email nama@domain.com --name 'Nama'"
 
 services:
   nextjs:
@@ -40,20 +41,13 @@ services:
       - HOSTNAME=0.0.0.0
       - NODE_ENV=${NODE_ENV}
       - AUTH_SECRET=${AUTH_SECRET}
-      # Harus sama dengan URL publik browser (OAuth redirect_uri). Kosong + HOSTNAME=0.0.0.0 bisa memicu invalid_grant "Code not valid" di Keycloak.
+      # URL publik website (dipakai Auth.js untuk redirect setelah login/logout).
       - AUTH_URL=${AUTH_URL}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@cache:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - DATABASE_URL=${DATABASE_URL}
-      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
-      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
-      - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
-      # Discovery OIDC dari jaringan Docker (realm = path di KEYCLOAK_ISSUER). Mengatasi fetch ke URL publik dari container yang sering non-200 (hairpin/proxy).
-      - KEYCLOAK_WELL_KNOWN=${KEYCLOAK_WELL_KNOWN:-http://keycloak:8080/realms/rft/.well-known/openid-configuration}
-      # Panggilan token/userinfo dari Next ke Keycloak via Docker (bukan https://keycloak... lewat Cloudflare).
-      - KEYCLOAK_INTERNAL_BASE_URL=${KEYCLOAK_INTERNAL_BASE_URL:-http://keycloak:8080}
       - S3_ENDPOINT=${S3_ENDPOINT}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
@@ -64,14 +58,8 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
-      keycloak:
-        condition: service_started
       minio:
         condition: service_started
-    # Auth.js mem-fetch OIDC dari URL publik KEYCLOAK_ISSUER. Tanpa extra_hosts, dari dalam container sering
-    # hairpin/NAT gagal → Configuration; panggilan token ke Keycloak bisa hang → 502 di reverse proxy.
-    extra_hosts:
-      - "${KEYCLOAK_PUBLIC_HOST}:host-gateway"
     networks:
       - native_rft_network
       - global-net
@@ -102,7 +90,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./scripts/init-db:/docker-entrypoint-initdb.d
     restart: unless-stopped
     networks:
       - native_rft_network
@@ -137,42 +124,6 @@ services:
       timeout: 20s
       retries: 3
       start_period: 10s
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: native_rft_keycloak
-    command: start
-    ports:
-      - "8095:8080"
-    environment:
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
-      - KC_DB_USERNAME=${POSTGRES_USER}
-      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
-      - KC_DB_SCHEMA=public
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      # Wajib di belakang TLS terminator (NPM/Cloudflare): issuer & endpoint di .well-known harus https://host publik.
-      # Tanpa URL penuh, request internal http://keycloak:8080 bisa menghasilkan issuer http://… → Auth.js error Configuration.
-      - KC_HOSTNAME=${KEYCLOAK_PUBLIC_HOST}
-      - KC_HOSTNAME_URL=https://${KEYCLOAK_PUBLIC_HOST}
-      - KC_HOSTNAME_STRICT=false
-      - KC_HTTP_ENABLED=true
-      - KC_HTTP_RELATIVE_PATH=/
-      - KC_PROXY_HEADERS=xforwarded
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - native_rft_network
-      - global-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
 
   # Sekali pakai: sinkronkan tabel Prisma ke Postgres (image Next produksi tidak berisi Prisma CLI).
   prisma-setup:

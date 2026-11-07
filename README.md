@@ -12,7 +12,7 @@ A high-performance, secure, and visually stunning corporate website built with N
 - **Animations:** Framer Motion
 - **Caching:** DragonflyDB (Redis-compatible, multi-threaded)
 - **Database:** PostgreSQL 15
-- **Authentication:** Keycloak (OIDC)
+- **Authentication:** Auth.js (email + password admin accounts stored in PostgreSQL)
 - **Object Storage:** MinIO (S3-compatible)
 - **Containerization:** Docker (multi-stage build)
 
@@ -44,9 +44,6 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/rft_blog
 
 # Authentication
 AUTH_SECRET=your-32-character-secret-here-minimum
-KEYCLOAK_CLIENT_ID=rft-web
-KEYCLOAK_CLIENT_SECRET=your-keycloak-client-secret
-KEYCLOAK_ISSUER=http://localhost:8080/realms/rft
 
 # DragonflyDB Configuration (Redis-compatible)
 REDIS_URL=redis://:your-password@localhost:6379
@@ -65,7 +62,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 **Important:** 
 - Set a strong `AUTH_SECRET` (minimum 32 characters)
-- Configure Keycloak first (see `SETUP_KEYCLOAK.md`)
+- Push the schema (`npm run db:push`) and create the first admin: `npm run admin:create -- --email you@example.com --name "Your Name"`, then log in at `/login`
 - Configure MinIO bucket (see `SETUP_MINIO.md`)
 - Set strong passwords for production
 

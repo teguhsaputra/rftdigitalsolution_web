@@ -3,10 +3,11 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { requiredImageRefSchema } from '@/lib/image-ref';
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: requiredImageRefSchema.optional(),
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),
 });

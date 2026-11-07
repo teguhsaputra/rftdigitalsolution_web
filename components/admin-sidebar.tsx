@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import {
   LayoutDashboard,
   FileText,
@@ -15,6 +15,8 @@ import {
   Users,
   Handshake,
   Image as ImageIcon,
+  ShieldCheck,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -22,27 +24,28 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/posts', label: 'Blogs', icon: FileText },
-  { href: '/admin/brand', label: 'Logo', icon: ImageIcon },
+  { href: '/admin/brand', label: 'Brand & Kontak', icon: ImageIcon },
   { href: '/admin/services', label: 'Layanan', icon: Briefcase },
   { href: '/admin/trusted-partners', label: 'Mitra & brand', icon: Handshake },
   { href: '/admin/portfolio', label: 'Portfolio', icon: Layers },
   { href: '/admin/about', label: 'Tentang', icon: Info },
   { href: '/admin/careers', label: 'Karier', icon: Users },
+  { href: '/admin/team', label: 'Tim Admin', icon: ShieldCheck },
+  { href: '/admin/account', label: 'Akun Saya', icon: UserCog },
 ];
 
 export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const [signingOut, setSigningOut] = useState(false);
+  const { data: session } = useSession();
 
   async function handleSignOut() {
     if (signingOut) return;
     setSigningOut(true);
     onNavigate?.();
     try {
-      // redirect: false = jangan buka halaman logout Keycloak dulu (sering lambat/tanpa UI).
-      // Cookie sesi app tetap dihapus di server; lalu kita arahkan ke beranda.
-      await signOut({ redirect: false, callbackUrl: '/' });
-      window.location.replace('/');
+      await signOut({ redirect: false });
+      window.location.replace('/login');
     } catch {
       setSigningOut(false);
     }
@@ -86,6 +89,12 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-border/40">
+        {session?.user && (
+          <div className="mb-3 px-4">
+            <p className="truncate text-sm font-semibold">{session.user.name}</p>
+            <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+          </div>
+        )}
         <Button
           type="button"
           variant="ghost"

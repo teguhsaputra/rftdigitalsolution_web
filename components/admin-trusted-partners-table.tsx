@@ -42,8 +42,8 @@ export function AdminTrustedPartnersTable({ items }: { items: Row[] }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-muted-foreground py-8 text-center">
-        Belum ada mitra. Tambah logo brand dari tombol di atas — tampilan beranda memakai placeholder
-        sampai ada data.
+        Belum ada mitra. Tambah logo dari tombol di atas — sampai ada data, beranda menampilkan
+        logo klien bawaan.
       </p>
     );
   }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Corporate website + CMS for PT. RFT Digital Solution. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with Keycloak (OIDC), DragonflyDB (Redis-compatible) cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
+Corporate website + CMS for PT. RFT Digital Solution. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with email + password admin accounts (no external identity provider), DragonflyDB (Redis-compatible) cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
 
 ## Commands
 
@@ -19,12 +19,12 @@ npm run db:seed              # prisma/seed.ts (blog posts)
 npm run db:seed:marketing    # prisma/seed-marketing.ts (services, portfolio, careers, about…)
 npm run db:studio
 
-npx tsx scripts/seed-keycloak.ts   # creates realm `rft`, client `rft-web`, roles, users in a running Keycloak
+npm run admin:create -- --email a@b.com --name "Nama"   # create/reset an admin account (prompts for password, or ADMIN_PASSWORD env)
 ```
 
 Unit tests cover the pure helpers in `lib/` (WhatsApp links, price formatting, brand settings resolution, portfolio filter, redirects). UI is verified with `npm run lint` + `npm run build`. `npm run build` needs a `DATABASE_URL`; without a DB use `DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy` (same as the Dockerfile).
 
-Local infra (Postgres on host port **15432**, Dragonfly, MinIO, Keycloak) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_KEYCLOAK.md` and `SETUP_MINIO.md` for service setup and troubleshooting.
+Local infra (Postgres on host port **15432**, Dragonfly, MinIO) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_MINIO.md` for service setup and troubleshooting.
 
 ## Architecture
 
@@ -33,10 +33,10 @@ Local infra (Postgres on host port **15432**, Dragonfly, MinIO, Keycloak) runs v
 - `app/admin/` — CMS pages (posts, services, portfolio, careers, trusted partners, about, brand). Each entity follows the same pattern: list page + `new/` + `[id]/` pages, backed by `components/admin-*-editor.tsx` / `admin-*-table.tsx` and a REST route in `app/api/admin/<entity>/` (`route.ts` for list/create, `[id]/route.ts` for update/delete).
 - `app/api/upload/presigned/` — returns a MinIO presigned PUT URL; the browser uploads directly (`components/image-upload.tsx`).
 
-**Auth** (`auth.ts`, `middleware.ts`, `types/next-auth.d.ts`)
-- JWT session (1 day). Roles are extracted from Keycloak `realm_access` / `resource_access[KEYCLOAK_CLIENT_ID]` (falling back to decoding the access token) and collapsed into `session.user.role` (`'admin'` or other).
-- `middleware.ts` only guards `/admin` pages. **API routes are not covered by middleware** — every `app/api/admin/*` handler must itself call `auth()` and check `session.user.role === 'admin'`.
-- `KEYCLOAK_INTERNAL_BASE_URL` / `KEYCLOAK_WELL_KNOWN` let the server talk to Keycloak over the Docker network while `KEYCLOAK_ISSUER` stays the public URL (issuer must match Keycloak's `KC_HOSTNAME`).
+**Auth** (`auth.config.ts`, `auth.ts`, `middleware.ts`, `lib/admin-auth.ts`, `types/next-auth.d.ts`)
+- Admins are rows in `AdminUser` (Prisma); passwords hashed with Node scrypt (`lib/password.ts`). Login = Auth.js Credentials provider → `authenticateAdmin()` (case-insensitive email, account locked 15 min after 5 failures). Team members are managed in `/admin/team`; own password in `/admin/account`; first admin via `npm run admin:create`.
+- JWT session (12 h). `auth.config.ts` is DB-free and used by `middleware.ts`; `auth.ts` adds the provider and re-checks on every `auth()` call that the account is still active (`refreshAdminToken`), so deactivated admins lose access immediately in pages/APIs.
+- `middleware.ts` only guards `/admin` pages. **API routes are not covered by middleware** — every `app/api/admin/*` handler must use `requireAdminSession()` (`lib/require-admin.ts`) or call `auth()` and check `session.user.role === 'admin'`.
 
 **Environment** (`lib/env.ts`) — all env access goes through the Zod-validated `env` export. At build time (`NEXT_PHASE=phase-production-build`, or missing/"dummy" `DATABASE_URL`) required vars get dummy defaults. It also rewrites `AUTH_URL`/`NEXTAUTH_URL` to avoid `0.0.0.0` redirect URIs in Docker. When adding a new env var, add it both to the schema and to the explicit object passed to `envSchema.parse`.
 

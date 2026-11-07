@@ -225,7 +225,8 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         <div className="space-y-2">
           <label className="text-sm font-medium">Image URL</label>
           <Input
-            type="url"
+            type="text"
+            inputMode="url"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Image URL"

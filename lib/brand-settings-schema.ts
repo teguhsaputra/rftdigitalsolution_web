@@ -1,13 +1,9 @@
 import { z } from 'zod';
 import { normalizeWhatsAppNumber } from '@/lib/whatsapp';
+import { imageRefSchema } from '@/lib/image-ref';
 
-/** '' (kosongkan), path relatif "/…", atau URL penuh. */
-const imageRef = z
-  .string()
-  .trim()
-  .refine((v) => v === '' || /^\/(?!\/)/.test(v) || z.string().url().safeParse(v).success, {
-    message: 'URL gambar tidak valid',
-  });
+/** '' (kosongkan), path di website ini, atau URL http(s) penuh. */
+const imageRef = imageRefSchema;
 
 const whatsappNumber = z
   .string()

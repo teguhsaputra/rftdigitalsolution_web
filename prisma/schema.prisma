@@ -118,3 +118,18 @@ model CareerOpening {
 
   @@index([published, sortOrder])
 }
+
+/// Akun admin panel (login email + password, tanpa Keycloak).
+model AdminUser {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String
+  passwordHash     String
+  role             String    @default("admin")
+  active           Boolean   @default(true)
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}

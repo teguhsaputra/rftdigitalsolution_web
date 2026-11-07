@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { imageRefSchema } from '@/lib/image-ref';
 
 const updateSchema = z.object({
   slug: z.string().min(1).optional(),
@@ -10,9 +11,7 @@ const updateSchema = z.object({
   clientType: z.string().min(1).optional(),
   focus: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
-  image: z
-    .union([z.string().url(), z.literal(''), z.null()])
-    .optional(),
+  image: z.union([imageRefSchema, z.null()]).optional(),
   services: z.array(z.string()).optional(),
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),

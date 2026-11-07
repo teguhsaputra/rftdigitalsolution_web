@@ -23,7 +23,7 @@ export default async function AdminTrustedPartnersPage() {
         <div>
           <h1 className="text-4xl font-bold mb-2">Mitra & brand</h1>
           <p className="text-muted-foreground">
-            Logo untuk strip &quot;Brand yang pernah bergerak bareng kami&quot; di beranda.
+            Logo untuk pita &quot;Dipercaya oleh&quot; di beranda (tampil hitam-putih, berwarna saat disorot).
           </p>
         </div>
         <Button asChild>

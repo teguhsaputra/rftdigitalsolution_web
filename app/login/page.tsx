@@ -1,133 +1,123 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { AlertTriangle, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { Lock, AlertTriangle, Info } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BRAND_MARK_FALLBACK_SRC, BRAND_SHORT_NAME } from '@/lib/brand';
+import { LOCK_MINUTES } from '@/lib/admin-auth-constants';
 
-const errorMessages: Record<string, { title: string; description: string; hint?: string }> = {
-  Configuration: {
-    title: 'Keycloak belum terhubung',
-    description:
-      'Sepertinya Keycloak belum di-setup atau realm/client belum dikonfigurasi. Pastikan Keycloak sudah running dan variabel KEYCLOAK_ISSUER, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET di .env sudah benar.',
-    hint: 'Cek SETUP_KEYCLOAK.md. Jika baru memperbaiki Keycloak/NPM, buka /login tanpa ?error=… di URL. Di Docker production, pastikan compose memetakan KEYCLOAK_PUBLIC_HOST ke host-gateway (lihat docker-compose).',
-  },
-  OAuthCallback: {
-    title: 'Gagal login via Keycloak',
-    description:
-      'Ada masalah saat callback dari Keycloak. Biasanya ini terjadi kalau redirect URI belum didaftarkan di Keycloak atau client secret berubah.',
-  },
-  Default: {
-    title: 'Login gagal',
-    description: 'Terjadi kesalahan saat proses login. Coba lagi atau hubungi administrator.',
-  },
+/** Hanya izinkan kembali ke halaman di website ini (cegah open redirect). */
+function safeCallbackUrl(raw: string | null): string {
+  if (raw && raw.startsWith('/') && !raw.startsWith('//')) return raw;
+  return '/admin';
+}
+
+const messages: Record<string, string> = {
+  invalid: 'Email atau password salah.',
+  locked: `Terlalu banyak percobaan gagal. Akun dikunci sementara ${LOCK_MINUTES} menit.`,
+  default: 'Login gagal. Coba lagi beberapa saat lagi.',
 };
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const errorParam = searchParams.get('error');
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [localError, setLocalError] = useState('');
+  const [error, setError] = useState(
+    searchParams.get('error') ? messages[searchParams.get('code') ?? ''] ?? messages.default : ''
+  );
 
-  const authError = errorParam
-    ? errorMessages[errorParam] ?? errorMessages.Default
-    : null;
-
-  const handleKeycloakLogin = async () => {
-    setLocalError('');
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
     setLoading(true);
-
     try {
-      await signIn('keycloak', {
-        callbackUrl: searchParams.get('callbackUrl') || '/admin',
-        redirect: true,
-      });
+      const res = await signIn('credentials', { email, password, redirect: false });
+      if (!res || res.error) {
+        setError(messages[res?.code ?? ''] ?? messages.default);
+        setLoading(false);
+        return;
+      }
+      window.location.assign(callbackUrl);
     } catch {
-      setLocalError('Tidak bisa terhubung. Pastikan koneksi internet lancar dan coba lagi.');
+      setError('Tidak bisa terhubung ke server. Periksa koneksi lalu coba lagi.');
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <Card className="border-border/40 bg-card/50 backdrop-blur-md shadow-xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-3xl font-bold">Masuk ke Admin</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Kelola konten website dari dashboard admin
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Auth.js redirect error */}
-          {authError && (
-            <div className="p-4 text-sm bg-destructive/10 border border-destructive/20 rounded-lg space-y-2">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-semibold text-destructive">{authError.title}</p>
-                  <p className="text-destructive/80 mt-1">{authError.description}</p>
-                  {authError.hint && (
-                    <p className="text-destructive/60 mt-2 flex items-center gap-1">
-                      <Info className="h-3 w-3" /> {authError.hint}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Local error (e.g. network) */}
-          {localError && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-              {localError}
-            </div>
-          )}
-
-          <div className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Login menggunakan akun Keycloak yang sudah terdaftar
-            </p>
-
-            <Button
-              type="button"
-              onClick={handleKeycloakLogin}
-              className="w-full"
-              disabled={loading}
-              size="lg"
-            >
-              <Lock className="h-4 w-4 mr-2" />
-              {loading ? 'Mengarahkan...' : 'Masuk dengan Keycloak'}
-            </Button>
-          </div>
+    <form onSubmit={onSubmit} className="space-y-5" noValidate>
+      {error && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          {error}
         </div>
-      </CardContent>
-    </Card>
+      )}
+      <div className="grid gap-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          autoComplete="username"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <Button type="submit" size="lg" className="w-full" disabled={loading || !email || !password}>
+        <Lock className="mr-2 h-4 w-4" aria-hidden />
+        {loading ? 'Memeriksa…' : 'Masuk'}
+      </Button>
+      <p className="text-center text-xs text-zinc-500">
+        Lupa password? Minta admin lain untuk mereset dari menu Tim Admin.
+      </p>
+    </form>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Suspense fallback={
-          <Card className="border-border/40 bg-card/50 backdrop-blur-md shadow-xl">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-3xl font-bold">Masuk ke Admin</CardTitle>
-              <CardDescription className="text-muted-foreground">Memuat...</CardDescription>
-            </CardHeader>
-          </Card>
-        }>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-[28px] border border-line bg-surface p-8">
+        <div className="mb-8 text-center">
+          <Image
+            src={BRAND_MARK_FALLBACK_SRC}
+            alt=""
+            width={48}
+            height={48}
+            className="mx-auto h-12 w-12 rounded-xl border border-line"
+          />
+          <h1 className="heading-display mt-5 text-3xl text-white">Masuk ke Admin</h1>
+          <p className="mt-2 text-sm text-zinc-400">{BRAND_SHORT_NAME}</p>
+        </div>
+        <Suspense fallback={<p className="text-center text-sm text-zinc-500">Memuat…</p>}>
           <LoginForm />
         </Suspense>
-      </motion.div>
-    </div>
+        <Link href="/" className="mt-6 block text-center text-xs text-zinc-500 hover:text-white">
+          ← Kembali ke website
+        </Link>
+      </div>
+    </main>
   );
 }

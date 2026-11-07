@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { requiredImageRefSchema } from '@/lib/image-ref';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +19,7 @@ import { ImageUpload } from '@/components/image-upload';
 
 const schema = z.object({
   name: z.string().min(1, 'Nama brand wajib'),
-  imageUrl: z.string().url('Upload logo terlebih dahulu'),
+  imageUrl: requiredImageRefSchema,
   sortOrder: z.string().optional(),
   published: z.boolean(),
 });
@@ -90,7 +91,7 @@ export function AdminTrustedPartnerEditor({
         <CardHeader>
           <CardTitle>{isEdit ? 'Edit mitra' : 'Mitra / brand baru'}</CardTitle>
           <CardDescription>
-            Logo tampil di strip &quot;Brand yang pernah bergerak bareng kami&quot; di beranda.
+            Logo tampil di pita &quot;Dipercaya oleh&quot; di beranda. Gunakan gambar persegi.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
