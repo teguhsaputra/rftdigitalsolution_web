@@ -1,39 +1,15 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Check, Plus } from 'lucide-react';
 import type { ServiceItem } from '@/lib/marketing-data';
 import { servicesHeading } from '@/lib/landing-copy';
 import { Eyebrow, Reveal, SectionTitle } from '@/components/landing/reveal';
 import { cn } from '@/lib/utils';
 
-/** Garis progres di bawah carousel horizontal. */
-export function useScrollProgress() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
-  const onScroll = () => {
-    const el = ref.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setProgress(max > 0 ? el.scrollLeft / max : 1);
-  };
-  return { ref, progress, onScroll };
-}
-
-export function ProgressBar({ progress }: { progress: number }) {
-  return (
-    <div className="mx-auto mt-6 h-[3px] max-w-6xl overflow-hidden rounded-full bg-line" aria-hidden>
-      <div
-        className="h-full rounded-full bg-white transition-[width] duration-150"
-        style={{ width: `${Math.max(12, progress * 100)}%` }}
-      />
-    </div>
-  );
-}
-
+/** Section Layanan: grid kartu; tombol + membuka poin detail tiap layanan. */
 export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
   const [open, setOpen] = useState<string | null>(null);
-  const { ref, progress, onScroll } = useScrollProgress();
 
   return (
     <section id="layanan" className="scroll-mt-24 px-4 py-20">
@@ -49,18 +25,14 @@ export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
         <p className="max-w-[260px] text-sm leading-relaxed text-zinc-500">{servicesHeading.hint}</p>
       </div>
 
-      <div
-        ref={ref}
-        onScroll={onScroll}
-        className="no-scrollbar mx-auto mt-10 flex max-w-6xl snap-x snap-mandatory gap-4 overflow-x-auto pb-2"
-      >
+      <div className="mx-auto mt-10 grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((s, i) => {
           const isOpen = open === s.slug;
           const detailId = `layanan-detail-${s.slug}`;
           return (
             <article
               key={s.slug}
-              className="relative flex min-h-[320px] w-[78vw] max-w-[300px] shrink-0 snap-start flex-col rounded-[24px] border border-line bg-surface p-6"
+              className="relative flex min-h-[260px] flex-col rounded-[24px] border border-line bg-surface p-6"
             >
               <span className="text-xs font-bold text-zinc-600">{String(i + 1).padStart(2, '0')}</span>
               <h3 className="mt-3 text-xl font-extrabold tracking-tight text-white">{s.title}</h3>
@@ -96,7 +68,6 @@ export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
           );
         })}
       </div>
-      <ProgressBar progress={progress} />
     </section>
   );
 }

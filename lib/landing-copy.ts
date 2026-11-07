@@ -44,7 +44,7 @@ export const servicesHeading = {
   title: 'Satu tim untuk semua urusan',
   accent: 'digital',
   titleEnd: 'bisnis Anda.',
-  hint: 'Tekan tanda + di tiap kartu untuk melihat detailnya. Geser untuk kartu lainnya.',
+  hint: 'Tekan tanda + di tiap kartu untuk melihat detail yang kami kerjakan.',
 };
 
 export const portfolioHeading = {

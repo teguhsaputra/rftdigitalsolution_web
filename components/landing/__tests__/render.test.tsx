@@ -55,3 +55,14 @@ it('partner marquee repeats logos so one loop is wider than the screen (no gap)'
   expect((html.match(/<button/g) ?? []).length).toBeGreaterThanOrEqual(48);
   expect(html).toContain('grayscale');
 });
+
+it('services are laid out in a grid (nothing clipped, no hidden horizontal scroll)', () => {
+  const services = ['Web', 'Mobile', 'SEO', 'Brand', 'Sosmed'].map((t) => ({
+    slug: t.toLowerCase(), title: t, titleEn: t, summary: 's', details: ['d'], priceFrom: null,
+  }));
+  const html = renderToString(<ServicesCarousel services={services} />);
+  expect(html).not.toContain('overflow-x-auto');
+  expect(html).toContain('lg:grid-cols-3');
+  expect(html).not.toMatch(/Geser/);
+  for (const s of services) expect(html).toContain(`>${s.title}<`);
+});
