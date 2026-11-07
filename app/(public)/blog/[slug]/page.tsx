@@ -42,7 +42,7 @@ export async function generateMetadata({
   const title = seoMeta?.metaTitle || post.title;
   const description =
     seoMeta?.metaDescription ||
-    `Artikel blog: ${post.title} — PT. Reliable Future Technology`;
+    `Artikel blog: ${post.title} — PT. RFT Digital Solution`;
   const keywords = seoMeta?.keywords || "";
 
   return {

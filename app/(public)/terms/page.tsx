@@ -19,8 +19,8 @@ export default function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-foreground text-base font-semibold">Hak kekayaan intelektual</h2>
           <p>
-            Seluruh konten di website ini (teks, branding, dan desain) adalah milik PT. Reliable Future
-            Technology atau pemberi lisensinya, kecuali dinyatakan sebaliknya. Penyalinan atau distribusi
+            Seluruh konten di website ini (teks, branding, dan desain) adalah milik PT. RFT Digital Solution
+            atau pemberi lisensinya, kecuali dinyatakan sebaliknya. Penyalinan atau distribusi
             ulang tanpa izin tidak diperkenankan.
           </p>
         </section>

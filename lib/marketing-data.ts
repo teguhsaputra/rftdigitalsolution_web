@@ -1,9 +1,9 @@
 /**
  * Konten marketing & data publik — satu sumber kebenaran untuk semua halaman.
- * PT. Reliable Future Technology — digital agency.
+ * PT. RFT Digital Solution — digital agency.
  */
 
-export const agencyName = 'PT. Reliable Future Technology';
+export const agencyName = 'PT. RFT Digital Solution';
 
 export const agencyPositioning =
   'Kami bantu bisnis Anda tampil lebih kuat di dunia digital — dari bikin website sampai naikin traffic, branding, dan kelola media sosial.';

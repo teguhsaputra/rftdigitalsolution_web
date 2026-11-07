@@ -58,7 +58,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
     <aside className="w-64 border-r border-border/40 bg-card/50 p-6 flex flex-col">
       <div className="mb-8">
         <h2 className="text-xl font-bold text-foreground">Admin Panel</h2>
-        <p className="text-sm text-muted-foreground mt-1">PT. Reliable Future Technology</p>
+        <p className="text-sm text-muted-foreground mt-1">PT. RFT Digital Solution</p>
       </div>
 
       <nav className="flex-1 space-y-2">
