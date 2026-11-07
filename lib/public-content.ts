@@ -10,7 +10,6 @@ import {
   type ServiceItem,
   type TrustedPartnerItem,
 } from '@/lib/marketing-data';
-import { getBrandSettings } from '@/lib/brand-settings-db';
 import { normalizePublicUrlForBrowser } from '@/lib/s3';
 
 export const ABOUT_PAGE_ID = 'default';
@@ -114,10 +113,6 @@ export async function getPublicTrustedPartners(): Promise<TrustedPartnerItem[]> 
   }
 }
 
-export async function getPublicBrandLogoUrl(): Promise<string> {
-  return (await getBrandSettings()).logoUrl;
-}
-
 /** Judul semua layanan (termasuk draft) untuk checklist di editor portofolio admin. */
 export async function getServiceTitleOptions(): Promise<string[]> {
   try {
@@ -138,7 +133,7 @@ export async function getPublicCareers(): Promise<CareerOpening[]> {
       where: { published: true },
       orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
     });
-    if (rows.length === 0) return careerOpenings;
+    // Tidak ada lowongan yang dipublikasikan → section Karier disembunyikan.
     return rows.map((r) => ({
       slug: r.slug,
       title: r.title,
