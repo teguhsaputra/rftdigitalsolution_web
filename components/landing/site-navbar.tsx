@@ -36,7 +36,7 @@ export function SiteNavbar({
             className="h-[34px] w-[34px] shrink-0 rounded-[10px] border border-line bg-black object-cover"
           />
           <span className="min-w-0 leading-tight">
-            <span className="block truncate text-sm font-extrabold tracking-tight text-white">
+            <span className="block text-[13px] font-extrabold leading-[1.1] tracking-tight text-white min-[400px]:truncate min-[400px]:text-sm">
               {BRAND_SHORT_NAME}
             </span>
             <span className="hidden truncate text-[10px] text-zinc-500 sm:block">{BRAND_TAGLINE}</span>

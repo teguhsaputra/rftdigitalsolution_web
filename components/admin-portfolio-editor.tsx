@@ -9,13 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { mergeServiceOptions } from '@/lib/portfolio';
 import { ImageUpload } from '@/components/image-upload';
 
 const schema = z.object({
@@ -74,7 +69,9 @@ export function AdminPortfolioEditor({
       focus: project?.focus ?? '',
       description: project?.description ?? '',
       image: project?.image ?? '',
-      services: project ? toStringArray(project.services) : [],
+      services: project
+        ? mergeServiceOptions(serviceOptions, toStringArray(project.services)).selected
+        : [],
       sortOrder: project != null ? String(project.sortOrder) : '0',
       published: project?.published ?? true,
     },
@@ -85,14 +82,12 @@ export function AdminPortfolioEditor({
   const image = watch('image');
   const selectedServices = watch('services');
   // Tag lama yang tidak ada di daftar layanan tetap ditampilkan agar tidak hilang diam-diam.
-  const allServiceOptions = [
-    ...serviceOptions,
-    ...toStringArray(project?.services).filter((s) => !serviceOptions.includes(s)),
-  ];
+  const allServiceOptions = mergeServiceOptions(
+    serviceOptions,
+    toStringArray(project?.services),
+  ).options;
   const toggleService = (name: string, checked: boolean) => {
-    const next = checked
-      ? [...selectedServices, name]
-      : selectedServices.filter((s) => s !== name);
+    const next = checked ? [...selectedServices, name] : selectedServices.filter((s) => s !== name);
     setValue('services', next, { shouldValidate: true });
   };
 
@@ -150,9 +145,7 @@ export function AdminPortfolioEditor({
           <div className="grid gap-2">
             <Label htmlFor="title">Judul project</Label>
             <Input id="title" {...register('title')} />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="slug">Slug</Label>
@@ -178,9 +171,7 @@ export function AdminPortfolioEditor({
             <div className="grid gap-2">
               <Label htmlFor="focus">Fokus layanan</Label>
               <Input id="focus" {...register('focus')} placeholder="Website • SEO" />
-              {errors.focus && (
-                <p className="text-sm text-destructive">{errors.focus.message}</p>
-              )}
+              {errors.focus && <p className="text-sm text-destructive">{errors.focus.message}</p>}
             </div>
           </div>
           <div className="grid gap-2">

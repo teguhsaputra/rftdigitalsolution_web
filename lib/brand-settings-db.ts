@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
 import { normalizePublicUrlForBrowser } from '@/lib/s3';
 import {
@@ -76,14 +77,17 @@ export async function getBrandFormValues(): Promise<BrandFormValues> {
   return toBrandFormValues(row);
 }
 
-export async function getBrandSettings(): Promise<BrandSettingsPublic> {
-  try {
-    const row = await prisma.brandSettings.findUnique({ where: { id: BRAND_SETTINGS_ID } });
-    return resolveBrandSettings(row);
-  } catch {
-    return resolveBrandSettings(null);
-  }
-}
+/** Di-cache per request (layout + halaman memakai data yang sama). */
+export const getBrandSettings = cache(
+  async function getBrandSettings(): Promise<BrandSettingsPublic> {
+    try {
+      const row = await prisma.brandSettings.findUnique({ where: { id: BRAND_SETTINGS_ID } });
+      return resolveBrandSettings(row);
+    } catch {
+      return resolveBrandSettings(null);
+    }
+  },
+);
 
 /** Simpan field yang dikirim; string kosong disimpan sebagai null. */
 export async function upsertBrandSettings(data: BrandSettingsInput): Promise<void> {

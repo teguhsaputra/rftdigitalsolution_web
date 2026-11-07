@@ -125,7 +125,7 @@ export function AdminCareerEditor({
       <Card>
         <CardHeader>
           <CardTitle>{isEdit ? 'Edit lowongan' : 'Lowongan baru'}</CardTitle>
-          <CardDescription>Halaman publik: /career</CardDescription>
+          <CardDescription>Tampil di section Karier beranda (/#karier).</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">

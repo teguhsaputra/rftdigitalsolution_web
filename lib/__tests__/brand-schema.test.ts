@@ -28,3 +28,7 @@ describe('brandSettingsUpdateSchema', () => {
     expect(brandSettingsUpdateSchema.safeParse({ contactEmail: 'nope' }).success).toBe(false);
   });
 });
+
+it('rejects protocol-relative logo URLs that point to another host', () => {
+  expect(brandSettingsUpdateSchema.safeParse({ logoUrl: '//evil.example/x.png' }).success).toBe(false);
+});

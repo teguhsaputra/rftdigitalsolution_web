@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
 import {
   aboutContent,
@@ -127,7 +128,8 @@ export async function getServiceTitleOptions(): Promise<string[]> {
   return coreServices.map((s) => s.title);
 }
 
-export async function getPublicCareers(): Promise<CareerOpening[]> {
+/** Di-cache per request (layout memakai ini untuk menu, beranda untuk section). */
+export const getPublicCareers = cache(async function getPublicCareers(): Promise<CareerOpening[]> {
   try {
     const rows = await prisma.careerOpening.findMany({
       where: { published: true },
@@ -146,4 +148,4 @@ export async function getPublicCareers(): Promise<CareerOpening[]> {
     // Jangan tampilkan lowongan contoh (fiktif) saat database bermasalah.
     return [];
   }
-}
+});

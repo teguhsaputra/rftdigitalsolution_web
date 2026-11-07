@@ -29,3 +29,12 @@ describe('server-rendered landing markup', () => {
     expect(html).toMatch(/<div[^>]*\binert\b/);
   });
 });
+
+import { ServicesCarousel } from '@/components/landing/services-carousel';
+
+it('collapsed service details are hidden from screen readers and linked to their toggle', () => {
+  const services = [{ slug: 'web', title: 'Web', titleEn: 'Web', summary: 's', details: ['d1'], priceFrom: null }];
+  const html = renderToString(<ServicesCarousel services={services} />);
+  expect(html).toMatch(/<ul[^>]*id="layanan-detail-web"[^>]*aria-hidden="true"|<ul[^>]*aria-hidden="true"[^>]*id="layanan-detail-web"/);
+  expect(html).toContain('aria-controls="layanan-detail-web"');
+});

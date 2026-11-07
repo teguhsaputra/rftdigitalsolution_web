@@ -5,7 +5,7 @@ import { normalizeWhatsAppNumber } from '@/lib/whatsapp';
 const imageRef = z
   .string()
   .trim()
-  .refine((v) => v === '' || v.startsWith('/') || z.string().url().safeParse(v).success, {
+  .refine((v) => v === '' || /^\/(?!\/)/.test(v) || z.string().url().safeParse(v).success, {
     message: 'URL gambar tidak valid',
   });
 

@@ -56,6 +56,7 @@ export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
       >
         {services.map((s, i) => {
           const isOpen = open === s.slug;
+          const detailId = `layanan-detail-${s.slug}`;
           return (
             <article
               key={s.slug}
@@ -65,6 +66,8 @@ export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
               <h3 className="mt-3 text-xl font-extrabold tracking-tight text-white">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-zinc-400">{s.summary}</p>
               <ul
+                id={detailId}
+                aria-hidden={!isOpen}
                 className={cn(
                   'mt-4 space-y-2 overflow-hidden text-sm text-zinc-300 transition-all duration-300 motion-reduce:transition-none',
                   isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
@@ -81,6 +84,7 @@ export function ServicesCarousel({ services }: { services: ServiceItem[] }) {
                 type="button"
                 onClick={() => setOpen(isOpen ? null : s.slug)}
                 aria-expanded={isOpen}
+                aria-controls={detailId}
                 aria-label={isOpen ? `Tutup detail ${s.title}` : `Lihat detail ${s.title}`}
                 className="mt-auto ml-auto grid h-10 w-10 place-items-center rounded-full bg-white text-[#09090b] transition-transform hover:scale-105"
               >

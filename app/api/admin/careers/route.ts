@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         published: data.published ?? true,
       },
     });
-    revalidatePath('/career');
+    revalidatePath('/');
     return NextResponse.json(row);
   } catch (e) {
     if (e instanceof z.ZodError) {

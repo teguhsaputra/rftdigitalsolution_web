@@ -65,7 +65,7 @@ export async function PUT(req: NextRequest, { params }: RouteProps) {
         ...(data.published !== undefined && { published: data.published }),
       },
     });
-    revalidatePath('/career');
+    revalidatePath('/');
     return NextResponse.json(row);
   } catch (e) {
     if (e instanceof z.ZodError) {
@@ -82,7 +82,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteProps) {
   const { id } = await params;
   try {
     await prisma.careerOpening.delete({ where: { id } });
-    revalidatePath('/career');
+    revalidatePath('/');
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });

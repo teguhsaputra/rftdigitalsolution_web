@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { priceFromSchema } from '@/lib/format';
 
 const createSchema = z.object({
   slug: z.string().min(1),
@@ -10,7 +11,7 @@ const createSchema = z.object({
   titleEn: z.string().min(1),
   summary: z.string().min(1),
   details: z.array(z.string()),
-  priceFrom: z.number().int().positive().nullable().optional(),
+  priceFrom: priceFromSchema.optional(),
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),
 });
