@@ -32,6 +32,8 @@ export async function PATCH(req: NextRequest, { params }: RouteProps) {
           passwordHash: await hashPassword(data.password),
           failedLoginCount: 0,
           lockedUntil: null,
+          // Keluarkan semua sesi lama akun ini.
+          sessionVersion: { increment: 1 },
         }),
       },
       select: adminPublicSelect,

@@ -41,3 +41,7 @@ describe('deactivationProblem', () => {
     expect(deactivationProblem({ targetId: 'b', actorId: 'a', activeAdmins: 2 })).toBeNull();
   });
 });
+
+it('caps password length so huge inputs are rejected before hashing', () => {
+  expect(createAdminSchema.safeParse({ name: 'A', email: 'a@rft.id', password: 'x'.repeat(257) }).success).toBe(false);
+});

@@ -3,6 +3,7 @@ import 'next-auth';
 declare module 'next-auth' {
   interface User {
     role?: string;
+    sessionVersion?: number;
   }
 
   interface Session {
@@ -18,5 +19,9 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     role?: string;
+    /** sessionVersion akun saat login */
+    sv?: number;
+    /** waktu login (detik epoch) */
+    loginAt?: number;
   }
 }

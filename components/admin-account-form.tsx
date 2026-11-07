@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,10 +33,10 @@ export function AdminAccountForm({ name, email }: { name: string; email: string 
       setMessage({ type: 'error', text: json.error || 'Gagal mengganti password' });
       return;
     }
-    setCurrent('');
-    setNext('');
-    setConfirm('');
-    setMessage({ type: 'ok', text: 'Password berhasil diganti.' });
+    setMessage({ type: 'ok', text: 'Password berhasil diganti. Silakan login lagi dengan password baru…' });
+    // Semua sesi (termasuk yang ini) sudah tidak berlaku setelah ganti password.
+    await signOut({ redirect: false });
+    window.location.replace('/login');
   }
 
   return (

@@ -5,7 +5,7 @@ it('accepts site paths and full URLs, rejects other hosts via // and junk', () =
   for (const ok of ['/portfolio/x.webp', 'https://s3.example.com/b/x.png', 'http://localhost:9000/b/x.png', '']) {
     expect(imageRefSchema.safeParse(ok).success).toBe(true);
   }
-  for (const bad of ['//evil.example/x.png', 'x.png', 'javascript:alert(1)']) {
+  for (const bad of ['//evil.example/x.png', '/\\evil.example/x.png', '/\t/evil.example', 'x.png', 'javascript:alert(1)']) {
     expect(imageRefSchema.safeParse(bad).success).toBe(false);
   }
 });

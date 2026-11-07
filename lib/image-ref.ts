@@ -2,7 +2,9 @@ import { z } from 'zod';
 
 /** Path di website ini ("/portfolio/x.webp") atau URL http(s) penuh (mis. MinIO/S3). */
 export function isImageRef(v: string): boolean {
-  if (/^\/(?!\/)/.test(v)) return true;
+  // Path di website ini: diawali satu "/", tanpa backslash/spasi/karakter kontrol (cegah "/\\host").
+  if (/^\/(?![\/\\])[^\\\s\u0000-\u001f]*$/.test(v)) return true;
+  if (v.startsWith('/')) return false;
   try {
     const u = new URL(v);
     return u.protocol === 'http:' || u.protocol === 'https:';

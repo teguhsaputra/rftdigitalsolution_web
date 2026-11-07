@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     }
     await prisma.adminUser.update({
       where: { id: me.id },
-      data: { passwordHash: await hashPassword(data.newPassword) },
+      // sessionVersion naik → semua sesi (termasuk sesi ini) harus login ulang dengan password baru.
+      data: { passwordHash: await hashPassword(data.newPassword), sessionVersion: { increment: 1 } },
     });
     return NextResponse.json({ ok: true });
   } catch (e) {

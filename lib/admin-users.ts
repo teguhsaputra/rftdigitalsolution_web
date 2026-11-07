@@ -1,7 +1,10 @@
 import { z } from 'zod';
-import { MIN_PASSWORD_LENGTH } from '@/lib/password';
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from '@/lib/password-rules';
 
-const password = z.string().min(MIN_PASSWORD_LENGTH, `Password minimal ${MIN_PASSWORD_LENGTH} karakter`);
+const password = z
+  .string()
+  .min(MIN_PASSWORD_LENGTH, `Password minimal ${MIN_PASSWORD_LENGTH} karakter`)
+  .max(MAX_PASSWORD_LENGTH, `Password maksimal ${MAX_PASSWORD_LENGTH} karakter`);
 
 /** Body POST /api/admin/users */
 export const createAdminSchema = z.object({
@@ -21,7 +24,7 @@ export const updateAdminSchema = z
 
 /** Body POST /api/admin/account/password */
 export const changeOwnPasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Password lama wajib diisi'),
+  currentPassword: z.string().min(1, 'Password lama wajib diisi').max(MAX_PASSWORD_LENGTH),
   newPassword: password,
 });
 

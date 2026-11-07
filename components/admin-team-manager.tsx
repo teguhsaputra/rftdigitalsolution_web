@@ -68,7 +68,7 @@ export function AdminTeamManager({ users, currentUserId }: { users: AdminRow[]; 
     e.preventDefault();
     const done = await run(
       () => send(`/api/admin/users/${user.id}`, 'PATCH', { password: resetPassword }),
-      `Password ${user.name} sudah direset.`
+      `Password ${user.name} sudah direset. Semua sesi lamanya otomatis keluar.`
     );
     if (done) {
       setResetFor(null);

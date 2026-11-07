@@ -11,12 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BRAND_MARK_FALLBACK_SRC, BRAND_SHORT_NAME } from '@/lib/brand';
 import { LOCK_MINUTES } from '@/lib/admin-auth-constants';
+import { safeCallbackPath } from '@/lib/safe-redirect';
 
-/** Hanya izinkan kembali ke halaman di website ini (cegah open redirect). */
-function safeCallbackUrl(raw: string | null): string {
-  if (raw && raw.startsWith('/') && !raw.startsWith('//')) return raw;
-  return '/admin';
-}
 
 const messages: Record<string, string> = {
   invalid: 'Email atau password salah.',
@@ -26,7 +22,6 @@ const messages: Record<string, string> = {
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,7 +40,7 @@ function LoginForm() {
         setLoading(false);
         return;
       }
-      window.location.assign(callbackUrl);
+      window.location.assign(safeCallbackPath(searchParams.get('callbackUrl'), window.location.origin));
     } catch {
       setError('Tidak bisa terhubung ke server. Periksa koneksi lalu coba lagi.');
       setLoading(false);

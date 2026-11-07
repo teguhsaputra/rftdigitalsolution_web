@@ -1,11 +1,11 @@
 import type { NextAuthConfig } from 'next-auth';
+import { SESSION_MAX_AGE_SECONDS } from './lib/admin-auth-constants';
 
-/** Masa berlaku sesi login admin (detik). */
-export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12; // 12 jam
+export { SESSION_MAX_AGE_SECONDS };
 
 /**
- * Konfigurasi dasar Auth.js tanpa akses database — aman dipakai di middleware.
- * Provider email + password ada di `auth.ts`.
+ * Konfigurasi dasar Auth.js (sesi JWT, halaman login, mapping token ↔ session).
+ * Provider email + password dan pengecekan ulang akun ada di `auth.ts`.
  */
 export const authConfig = {
   // Docker / reverse proxy: hindari error UntrustedHost di /api/auth/*.
@@ -21,6 +21,8 @@ export const authConfig = {
         token.role = user.role;
         token.name = user.name;
         token.email = user.email;
+        token.sv = user.sessionVersion;
+        token.loginAt = Math.floor(Date.now() / 1000);
       }
       return token;
     },

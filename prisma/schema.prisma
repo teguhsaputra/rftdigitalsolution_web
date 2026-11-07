@@ -127,6 +127,8 @@ model AdminUser {
   passwordHash     String
   role             String    @default("admin")
   active           Boolean   @default(true)
+  /// Naik setiap ganti/reset password → semua sesi lama otomatis tidak berlaku.
+  sessionVersion   Int       @default(0)
   failedLoginCount Int       @default(0)
   lockedUntil      DateTime?
   lastLoginAt      DateTime?
