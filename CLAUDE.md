@@ -29,7 +29,7 @@ Local infra (Postgres on host port **15432**, Dragonfly, MinIO, Keycloak) runs v
 ## Architecture
 
 **Route groups**
-- `app/(public)/` — one-page landing (`page.tsx`) + `/blog`, `/privacy`, `/terms`. The layout (`force-dynamic`) renders the announcement bar, floating navbar, closing section/footer and floating WhatsApp CTA. Landing sections live in `components/landing/` (one file per section, anchors `#layanan`, `#portofolio`, `#harga`, `#tentang`, `#karier`, `#blog`, `#faq`, `#kontak`); static copy lives in `lib/landing-copy.ts`. Old routes `/about`, `/services`, `/projects`, `/career`, `/contact` are 308 redirects to those anchors in `next.config.ts`.
+- `app/(public)/` — one-page landing (`page.tsx`) + `/blog`, `/privacy`, `/terms`. The layout (`force-dynamic`) renders the announcement bar, floating navbar, closing section/footer and floating WhatsApp CTA. Landing sections live in `components/landing/` (one file per section, anchors `#layanan`, `#portofolio`, `#harga`, `#tentang`, `#blog`, `#faq`, `#kontak`); static copy lives in `lib/landing-copy.ts`. Old routes `/about`, `/services`, `/projects`, `/contact` are 308 redirects to those anchors in `next.config.ts`; `/career` redirects to `/` (the careers section is currently not shown publicly; admin careers and data remain).
 - `app/admin/` — CMS pages (posts, services, portfolio, careers, trusted partners, about, brand). Each entity follows the same pattern: list page + `new/` + `[id]/` pages, backed by `components/admin-*-editor.tsx` / `admin-*-table.tsx` and a REST route in `app/api/admin/<entity>/` (`route.ts` for list/create, `[id]/route.ts` for update/delete).
 - `app/api/upload/presigned/` — returns a MinIO presigned PUT URL; the browser uploads directly (`components/image-upload.tsx`).
 

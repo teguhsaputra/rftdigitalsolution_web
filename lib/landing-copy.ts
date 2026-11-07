@@ -14,7 +14,6 @@ export const navLinks = [
   { href: '/#portofolio', label: 'Portofolio' },
   { href: '/#harga', label: 'Harga' },
   { href: '/#tentang', label: 'Tentang' },
-  { href: '/#karier', label: 'Karier', id: 'karier' },
   { href: '/blog', label: 'Blog' },
 ] as const;
 
@@ -101,14 +100,6 @@ export function buildStats(counts: { clients: number; projects: number; services
     { value: `${counts.services}`, unit: 'LAYANAN', text: 'dikerjakan satu tim' },
   ];
 }
-
-export const careersHeading = {
-  eyebrow: 'Karier',
-  title: 'Mau ikut',
-  accent: 'membangun',
-  titleEnd: 'bersama kami?',
-  apply: 'Kirim lamaran',
-};
 
 export const blogHeading = {
   eyebrow: 'Artikel terbaru',

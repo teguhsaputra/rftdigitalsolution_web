@@ -66,3 +66,10 @@ it('services are laid out in a grid (nothing clipped, no hidden horizontal scrol
   expect(html).not.toMatch(/Geser/);
   for (const s of services) expect(html).toContain(`>${s.title}<`);
 });
+
+it('navbar has no Karier link', async () => {
+  const { SiteNavbar } = await import('@/components/landing/site-navbar');
+  const html = renderToString(<SiteNavbar brand={brand} />);
+  expect(html).not.toContain('#karier');
+  expect(html).toContain('/#portofolio');
+});

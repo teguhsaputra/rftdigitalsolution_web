@@ -10,15 +10,9 @@ import { BRAND_LOGO_ALT, BRAND_SHORT_NAME, BRAND_TAGLINE } from '@/lib/brand';
 import { navLinks } from '@/lib/landing-copy';
 import { ContactButton } from '@/components/landing/contact-button';
 
-export function SiteNavbar({
-  brand,
-  hasCareers = true,
-}: {
-  brand: BrandSettingsPublic;
-  hasCareers?: boolean;
-}) {
+export function SiteNavbar({ brand }: { brand: BrandSettingsPublic }) {
   const { isMobileMenuOpen, closeMobileMenu, openMobileMenu } = useUIStore();
-  const links = navLinks.filter((l) => hasCareers || !('id' in l && l.id === 'karier'));
+  const links = navLinks;
 
   return (
     <header className="pointer-events-none sticky top-3 z-50 px-4">

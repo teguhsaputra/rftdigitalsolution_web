@@ -1,12 +1,9 @@
-import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
 import {
   aboutContent,
-  careerOpenings,
   coreServices,
   portfolioProjects,
   trustedPartners,
-  type CareerOpening,
   type PortfolioItem,
   type ServiceItem,
   type TrustedPartnerItem,
@@ -127,25 +124,3 @@ export async function getServiceTitleOptions(): Promise<string[]> {
   }
   return coreServices.map((s) => s.title);
 }
-
-/** Di-cache per request (layout memakai ini untuk menu, beranda untuk section). */
-export const getPublicCareers = cache(async function getPublicCareers(): Promise<CareerOpening[]> {
-  try {
-    const rows = await prisma.careerOpening.findMany({
-      where: { published: true },
-      orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
-    });
-    // Tidak ada lowongan yang dipublikasikan → section Karier disembunyikan.
-    return rows.map((r) => ({
-      slug: r.slug,
-      title: r.title,
-      location: r.location,
-      type: r.type,
-      description: r.description,
-      responsibilities: asStringArray(r.responsibilities),
-    }));
-  } catch {
-    // Jangan tampilkan lowongan contoh (fiktif) saat database bermasalah.
-    return [];
-  }
-});

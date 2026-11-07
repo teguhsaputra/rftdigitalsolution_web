@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
       { source: '/about', destination: '/#tentang', permanent: true },
       { source: '/services', destination: '/#layanan', permanent: true },
       { source: '/projects', destination: '/#portofolio', permanent: true },
-      { source: '/career', destination: '/#karier', permanent: true },
+      { source: '/career', destination: '/', permanent: true },
       { source: '/contact', destination: '/#kontak', permanent: true },
     ];
   },
