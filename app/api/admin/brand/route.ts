@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
 import { getBrandSettings, upsertBrandSettings } from '@/lib/brand-settings-db';
+import { brandSettingsUpdateSchema } from '@/lib/brand-settings-schema';
 import { z } from 'zod';
-
-const schema = z.object({
-  logoUrl: z.string().url(),
-});
 
 async function requireAdmin() {
   const session = await auth();
@@ -27,19 +24,19 @@ export async function PUT(req: NextRequest) {
   const deny = await requireAdmin();
   if (deny) return deny;
   try {
-    const data = schema.parse(await req.json());
-    await upsertBrandSettings({ logoUrl: data.logoUrl });
-    const row = await getBrandSettings();
-    // Ensure brand logo changes reflect everywhere (layout + page)
+    const data = brandSettingsUpdateSchema.parse(await req.json());
+    await upsertBrandSettings(data);
+    // Logo, WA & email dipakai di layout publik dan halaman utama.
     revalidatePath('/', 'layout');
-    revalidatePath('/', 'page');
-    return NextResponse.json(row);
+    return NextResponse.json(await getBrandSettings());
   } catch (e) {
     if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid data', details: e.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: e.issues[0]?.message ?? 'Invalid data', details: e.issues },
+        { status: 400 }
+      );
     }
     console.error(e);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

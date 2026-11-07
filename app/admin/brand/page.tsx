@@ -2,16 +2,15 @@ import { AdminBrandEditor } from '@/components/admin-brand-editor';
 import { getBrandSettings } from '@/lib/brand-settings-db';
 
 export default async function AdminBrandPage() {
-  const initialLogoUrl = (await getBrandSettings()).logoUrl;
+  const initial = await getBrandSettings();
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-4xl font-bold mb-2">Brand</h1>
-        <p className="text-muted-foreground">Atur logo utama website.</p>
+        <p className="text-muted-foreground">Atur logo, nomor WhatsApp, dan email kontak website.</p>
       </div>
-      <AdminBrandEditor initialLogoUrl={initialLogoUrl} />
+      <AdminBrandEditor initial={initial} />
     </div>
   );
 }
-
