@@ -3,13 +3,15 @@ import {
   aboutContent,
   careerOpenings,
   coreServices,
+  legacyPortfolioSlugs,
   portfolioProjects,
+  trustedPartners,
 } from '../lib/marketing-data';
 import { ABOUT_PAGE_ID } from '../lib/public-content';
 import { BRAND_SETTINGS_ID, DEFAULT_WHATSAPP_MESSAGE, LEGACY_LOGO_SRCS } from '../lib/brand';
 
 /**
- * Seed / upsert: About (satu dokumen), Layanan, Portfolio, Karier.
+ * Seed / upsert: About (satu dokumen), Layanan, Portfolio, Mitra, Karier.
  * Dipakai oleh `prisma/seed.ts` dan skrip `npm run db:seed:marketing`.
  */
 export async function seedMarketingContent(prisma: PrismaClient) {
@@ -76,7 +78,7 @@ export async function seedMarketingContent(prisma: PrismaClient) {
         clientType: p.clientType,
         focus: p.focus,
         description: p.description,
-        image: null,
+        image: p.image ?? null,
         services: p.services,
         sortOrder: sort++,
         published: true,
@@ -91,6 +93,30 @@ export async function seedMarketingContent(prisma: PrismaClient) {
         published: true,
       },
     });
+    // Isi gambar hanya bila belum ada (jangan timpa gambar yang diunggah lewat admin).
+    if (p.image) {
+      await prisma.portfolioProject.updateMany({
+        where: { slug: p.slug, image: null },
+        data: { image: p.image },
+      });
+    }
+  }
+  // Contoh project lama (fiktif) disembunyikan, tidak dihapus.
+  await prisma.portfolioProject.updateMany({
+    where: { slug: { in: legacyPortfolioSlugs } },
+    data: { published: false },
+  });
+
+  // Mitra: buat yang belum ada saja, supaya perubahan dari admin tidak tertimpa.
+  sort = 0;
+  for (const partner of trustedPartners) {
+    const existing = await prisma.trustedPartner.findFirst({ where: { name: partner.name } });
+    if (!existing && partner.imageUrl) {
+      await prisma.trustedPartner.create({
+        data: { name: partner.name, imageUrl: partner.imageUrl, sortOrder: sort, published: true },
+      });
+    }
+    sort++;
   }
 
   sort = 0;

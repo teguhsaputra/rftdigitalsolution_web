@@ -8,16 +8,20 @@ export const agencyName = 'PT. RFT Digital Solution';
 export const agencyPositioning =
   'Kami bantu bisnis Anda tampil lebih kuat di dunia digital — dari bikin website sampai naikin traffic, branding, dan kelola media sosial.';
 
-/** Fallback marquee jika belum ada mitra di database (admin: /admin/trusted-partners). */
+/** Klien yang sudah bekerja dengan kami (logo di public/partners). Admin: /admin/trusted-partners. */
 export type TrustedPartnerItem = { name: string; imageUrl: string | null };
 
-export const trustedPartnerPlaceholders: TrustedPartnerItem[] = [
-  { name: 'Mitra 1', imageUrl: null },
-  { name: 'Mitra 2', imageUrl: null },
-  { name: 'Mitra 3', imageUrl: null },
-  { name: 'Mitra 4', imageUrl: null },
-  { name: 'Mitra 5', imageUrl: null },
-  { name: 'Mitra 6', imageUrl: null },
+export const trustedPartners: TrustedPartnerItem[] = [
+  { name: 'Bloometry Bouquet', imageUrl: '/partners/bloometry-bouquet.webp' },
+  { name: 'Fakultas Kedokteran UIN Jakarta', imageUrl: '/partners/fk-uin-jakarta.webp' },
+  { name: 'Reliprove', imageUrl: '/partners/reliprove.webp' },
+  { name: 'Millenials Farm', imageUrl: '/partners/millenials-farm.webp' },
+  { name: 'PT Yabes Mega Utama', imageUrl: '/partners/yabes-mega-utama.webp' },
+  { name: 'Launa', imageUrl: '/partners/launa.webp' },
+  { name: 'Natura Hills', imageUrl: '/partners/natura-hills.webp' },
+  { name: 'Takar Rasa', imageUrl: '/partners/takar-rasa.webp' },
+  { name: 'Thirstea', imageUrl: '/partners/thristea.webp' },
+  { name: 'Terus Terang Teknologi', imageUrl: '/partners/terus-terang-teknologi.webp' },
 ];
 
 export type ServiceItem = {
@@ -108,51 +112,125 @@ export type PortfolioItem = {
   services: string[];
 };
 
+/** Contoh project lama (fiktif) — seed menyembunyikannya bila masih ada di database. */
+export const legacyPortfolioSlugs = [
+  'korporat-fnb',
+  'startup-logistik',
+  'retail-kosmetik',
+  'edtech-membership',
+  'klinik-kesehatan',
+];
+
 export const portfolioProjects: PortfolioItem[] = [
   {
-    slug: 'korporat-fnb',
-    title: 'Website restoran + sistem pemesanan online',
-    clientType: 'F&B • Jakarta',
-    focus: 'Website • SEO • Social Media',
+    slug: 'bloometry-bouquet-ecommerce',
+    title: 'Website e-commerce Bloometry Bouquet',
+    clientType: 'Florist & Beauty • E-commerce',
+    focus: 'React.js • Node.js • PostgreSQL',
     description:
-      'Bikin website responsif lengkap dengan menu, lokasi cabang, dan tombol reservasi. Kontennya dioptimasi buat pencarian lokal, plus kami siapin template sosmed untuk promo musiman.',
-    services: ['Pembuatan Website', 'SEO Management', 'Social Media'],
+      'Toko online cepat dengan katalog produk, pencarian & filter, checkout aman dengan banyak metode pembayaran, pelacakan pesanan, dan CMS untuk promo musiman. Dibangun SEO-friendly supaya mudah ditemukan dan gampang konversi.',
+    image: '/portfolio/bloometry-ecommerce.webp',
+    services: ['Pembuatan Website', 'SEO Management'],
   },
   {
-    slug: 'startup-logistik',
-    title: 'Dashboard operasional & landing page investor',
-    clientType: 'Logistik • Bandung',
-    focus: 'Website • Branding',
+    slug: 'meducalc-fk-uin-jakarta',
+    title: 'MeduCalc — aplikasi web pendidikan kedokteran',
+    clientType: 'Fakultas Kedokteran UIN Jakarta • Pendidikan',
+    focus: 'React.js • Node.js • SQL',
     description:
-      'Landing page yang ngejelasin value proposition ke calon investor, branding kit digital yang rapi, dan halaman dokumentasi API buat mitra integrasi.',
+      'Aplikasi web untuk FK UIN Jakarta dengan modul perhitungan medis yang akurat dan pembelajaran interaktif. Cepat, aman, dan siap dipakai untuk kebutuhan akademik yang kompleks.',
+    image: '/portfolio/meducalc-fk-uin.webp',
+    services: ['Pembuatan Website'],
+  },
+  {
+    slug: 'reliprove-sertifikasi',
+    title: 'Reliprove — aplikasi web sertifikasi',
+    clientType: 'Asesmen & Sertifikasi • Korporat & Akademik',
+    focus: 'Aplikasi web • Auto scoring • Verifikasi QR',
+    description:
+      'Platform sertifikasi dengan peran admin, asesor, dan peserta: pendaftaran online, bank soal, tes acak, rubrik, penilaian otomatis, verifikasi sertifikat lewat QR code, tanda tangan digital, dan dashboard real-time.',
+    image: '/portfolio/reliprove-sertifikasi.webp',
+    services: ['Pembuatan Website'],
+  },
+  {
+    slug: 'lppm-yabes-mega-utama',
+    title: 'Aplikasi web custom untuk LPPM',
+    clientType: 'PT Yabes Mega Utama • Institusi',
+    focus: 'React.js • Node.js • SQL',
+    description:
+      'Aplikasi web custom hasil kolaborasi dengan LPPM dan PT Yabes Mega Utama (Jakarta Barat) untuk kebutuhan akademik dan institusi — performa cepat, data andal, dan mudah dikembangkan.',
+    image: '/portfolio/lppm-yabes-web-app.webp',
+    services: ['Pembuatan Website'],
+  },
+  {
+    slug: 'kleon-uiux-website',
+    title: 'Desain UI/UX website KLEON',
+    clientType: 'Korporat • Jakarta Pusat',
+    focus: 'Figma • Wireframe • Prototype',
+    description:
+      'Desain UI/UX end-to-end di Figma: dari wireframe sampai prototype interaktif, dengan design system yang rapi dan siap dikembangkan, fokus pada pengalaman pengguna dan aksesibilitas.',
+    image: '/portfolio/kleon-uiux-web.webp',
     services: ['Pembuatan Website', 'Branding'],
   },
   {
-    slug: 'retail-kosmetik',
-    title: 'Mini e-commerce & kampanye Instagram',
-    clientType: 'Retail • Surabaya',
-    focus: 'Website • Social Media • SEO',
+    slug: 'aplikasi-mobile-fnb',
+    title: 'Aplikasi mobile F&B (Android & iOS)',
+    clientType: 'F&B • Restoran & Kafe',
+    focus: 'Flutter • Firebase • REST API',
     description:
-      'Katalog produk online dengan checkout simpel, template konten reels dan story yang tinggal pakai, plus artikel blog yang nembak long-tail keyword.',
-    services: ['Pembuatan Website', 'Social Media', 'SEO Management'],
+      'Aplikasi restoran dengan pemesanan online, pelacakan pengiriman real-time, reservasi meja, pembayaran terintegrasi, loyalty & promo, plus dashboard analitik untuk meningkatkan repeat order.',
+    image: '/portfolio/aplikasi-fnb.webp',
+    services: ['Aplikasi Mobile'],
   },
   {
-    slug: 'edtech-membership',
-    title: 'Aplikasi membership untuk platform pelatihan',
-    clientType: 'EdTech • Remote',
-    focus: 'Mobile Apps • Website',
+    slug: 'aplikasi-fitness-kesehatan',
+    title: 'Desain UI/UX aplikasi fitness & kesehatan',
+    clientType: 'Kesehatan • Android & iOS',
+    focus: 'UI/UX mobile app',
     description:
-      'Aplikasi mobile buat peserta pelatihan — akses materi, cek jadwal, dan terima notifikasi. Plus website marketing untuk akuisisi lead baru.',
-    services: ['Aplikasi Mobile', 'Pembuatan Website'],
+      'Desain aplikasi untuk memantau kalori, nutrisi, dan performa latihan — lengkap dengan saran menu, jadwal olahraga, dashboard personal, dan grafik progres yang jelas dan memotivasi.',
+    image: '/portfolio/aplikasi-fitness.webp',
+    services: ['Aplikasi Mobile', 'Branding'],
   },
   {
-    slug: 'klinik-kesehatan',
-    title: 'Rebranding klinik & sistem jadwal online',
-    clientType: 'Kesehatan • Yogyakarta',
-    focus: 'Branding • Website • SEO',
+    slug: 'sosmed-strategi-konten',
+    title: 'Strategi & konten media sosial',
+    clientType: 'Event & Lifestyle • BSD',
+    focus: 'Desain konten • Kampanye • Iklan',
     description:
-      'Rebranding visual dari nol, website profil dokter dan layanan, plus schema markup khusus fasilitas kesehatan biar muncul di pencarian lokal.',
-    services: ['Branding', 'Pembuatan Website', 'SEO Management'],
+      'Strategi kreatif, konten yang engaging, dan pesan brand yang konsisten di Instagram, TikTok, dan Facebook — fokus menumbuhkan audiens dan hasil yang terukur.',
+    image: '/portfolio/sosmed-strategi-konten.webp',
+    services: ['Social Media'],
+  },
+  {
+    slug: 'sosmed-desain-bsd',
+    title: 'Kelola & desain media sosial',
+    clientType: 'UMKM • BSD, Tangerang Selatan',
+    focus: 'Desain konten • Copywriting • Ads',
+    description:
+      'Desain konten, produksi foto & video, copywriting, dan eksekusi kampanye, plus pengelolaan iklan dan analitik performa untuk memaksimalkan jangkauan dan ROI.',
+    image: '/portfolio/sosmed-desain-bsd.webp',
+    services: ['Social Media'],
+  },
+  {
+    slug: 'sosmed-agribisnis',
+    title: 'Media sosial untuk brand agribisnis',
+    clientType: 'Pertanian & Agribisnis',
+    focus: 'Konten lapangan • Kalender musiman',
+    description:
+      'Konten dari lahan dan fasilitas, kalender konten mengikuti musim tanam dan panen, cerita farm-to-table, serta iklan untuk menambah jangkauan, leads, dan penjualan marketplace.',
+    image: '/portfolio/sosmed-agribisnis.webp',
+    services: ['Social Media'],
+  },
+  {
+    slug: 'sosmed-florist',
+    title: 'Media sosial untuk florist',
+    clientType: 'Florist & Dekorasi Event',
+    focus: 'Konten studio • Kampanye musiman',
+    description:
+      'Kalender konten untuk Valentine, Hari Ibu, pernikahan, dan hadiah korporat — menonjolkan keindahan buket, proses di balik layar, dan ulasan pelanggan untuk mendorong inquiry dan penjualan.',
+    image: '/portfolio/sosmed-florist.webp',
+    services: ['Social Media'],
   },
 ];
 

@@ -5,7 +5,7 @@ import {
   careerOpenings,
   coreServices,
   portfolioProjects,
-  trustedPartnerPlaceholders,
+  trustedPartners,
   type CareerOpening,
   type PortfolioItem,
   type ServiceItem,
@@ -107,10 +107,10 @@ export async function getPublicTrustedPartners(): Promise<TrustedPartnerItem[]> 
       where: { published: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     });
-    if (rows.length === 0) return trustedPartnerPlaceholders;
+    if (rows.length === 0) return trustedPartners;
     return rows.map((r) => ({ name: r.name, imageUrl: normalizePublicUrlForBrowser(r.imageUrl) }));
   } catch {
-    return trustedPartnerPlaceholders;
+    return trustedPartners;
   }
 }
 

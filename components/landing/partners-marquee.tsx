@@ -14,17 +14,18 @@ export function PartnersMarquee({ partners }: { partners: TrustedPartnerItem[] }
       <div className="relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
         <div className="flex w-max animate-marquee">
           {[0, 1].map((copy) => (
-            <ul key={copy} className="flex shrink-0 items-center gap-14 pr-14" aria-hidden={copy === 1}>
+            <ul key={copy} className="flex shrink-0 items-center gap-5 pr-5" aria-hidden={copy === 1}>
               {row.map((p, i) => (
-                <li key={`${copy}-${i}`} className="flex h-10 items-center">
+                <li key={`${copy}-${i}`} className="flex items-center">
                   {p.imageUrl ? (
                     <Image
                       src={p.imageUrl}
                       alt={p.name}
-                      width={120}
-                      height={40}
+                      title={p.name}
+                      width={72}
+                      height={72}
                       unoptimized
-                      className="h-8 w-auto object-contain opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0"
+                      className="h-[72px] w-[72px] rounded-2xl border border-line bg-surface object-contain opacity-80 transition-opacity hover:opacity-100"
                     />
                   ) : (
                     <span className="text-lg font-extrabold tracking-tight text-zinc-600">{p.name}</span>
