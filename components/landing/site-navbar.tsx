@@ -54,7 +54,7 @@ export function SiteNavbar({
         </ul>
 
         <div className="flex shrink-0 items-center gap-1">
-          <ContactButton brand={brand} label="Chat WhatsApp" variant="compact" />
+          <ContactButton brand={brand} label="Chat WhatsApp" shortLabel="Chat WA" variant="compact" />
           <button
             type="button"
             onClick={openMobileMenu}

@@ -17,6 +17,7 @@ export function ContactButton({
   brand,
   topic,
   label,
+  shortLabel,
   variant = 'primary',
   arrow = false,
   className,
@@ -24,6 +25,8 @@ export function ContactButton({
   brand: BrandSettingsPublic;
   topic?: string;
   label: string;
+  /** Label lebih pendek untuk layar < 640px. */
+  shortLabel?: string;
   variant?: Variant;
   arrow?: boolean;
   className?: string;
@@ -33,7 +36,9 @@ export function ContactButton({
   const isEmail = href.startsWith('mailto:');
   const Icon = isEmail ? Mail : MessageCircle;
   // Nomor WA belum diatur → jangan janjikan WhatsApp.
-  const text = isEmail && /whatsapp|\bwa\b/i.test(label) ? 'Kirim email' : label;
+  const promisesWa = (t: string) => /whatsapp|\bwa\b/i.test(t);
+  const text = isEmail && promisesWa(label) ? 'Kirim email' : label;
+  const short = shortLabel && (isEmail && promisesWa(shortLabel) ? 'Email' : shortLabel);
 
   return (
     <a
@@ -46,7 +51,14 @@ export function ContactButton({
       )}
     >
       {variant !== 'compact' && <Icon className="h-4 w-4" aria-hidden />}
-      {text}
+      {short ? (
+        <>
+          <span className="sm:hidden">{short}</span>
+          <span className="hidden sm:inline">{text}</span>
+        </>
+      ) : (
+        text
+      )}
       {arrow && <ArrowRight className="h-4 w-4" aria-hidden />}
     </a>
   );

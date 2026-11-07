@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Corporate website + CMS for PT. Reliable Future Technology. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with Keycloak (OIDC), DragonflyDB (Redis-compatible) cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
+Corporate website + CMS for PT. RFT Digital Solution. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with Keycloak (OIDC), DragonflyDB (Redis-compatible) cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
 
 ## Commands
 
@@ -12,6 +12,7 @@ Corporate website + CMS for PT. Reliable Future Technology. Next.js 16 (App Rout
 npm run dev                  # Next dev server (localhost:3000)
 npm run build && npm start   # production build (standalone output when NODE_ENV=production)
 npm run lint                 # ESLint (flat config, eslint-config-next)
+npm test                     # Vitest unit tests (lib/**/__tests__); single file: npx vitest run lib/__tests__/whatsapp.test.ts
 
 npm run db:push              # prisma db push — the project uses push, there is no prisma/migrations folder
 npm run db:seed              # prisma/seed.ts (blog posts)
@@ -21,14 +22,14 @@ npm run db:studio
 npx tsx scripts/seed-keycloak.ts   # creates realm `rft`, client `rft-web`, roles, users in a running Keycloak
 ```
 
-There is no test suite. Verify changes with `npm run lint` and `npm run build`.
+Unit tests cover the pure helpers in `lib/` (WhatsApp links, price formatting, brand settings resolution, portfolio filter, redirects). UI is verified with `npm run lint` + `npm run build`. `npm run build` needs a `DATABASE_URL`; without a DB use `DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy` (same as the Dockerfile).
 
 Local infra (Postgres on host port **15432**, Dragonfly, MinIO, Keycloak) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_KEYCLOAK.md` and `SETUP_MINIO.md` for service setup and troubleshooting.
 
 ## Architecture
 
 **Route groups**
-- `app/(public)/` — marketing site + blog. Its layout sets `dynamic = 'force-dynamic'`, so pages render per-request from the DB.
+- `app/(public)/` — one-page landing (`page.tsx`) + `/blog`, `/privacy`, `/terms`. The layout (`force-dynamic`) renders the announcement bar, floating navbar, closing section/footer and floating WhatsApp CTA. Landing sections live in `components/landing/` (one file per section, anchors `#layanan`, `#portofolio`, `#harga`, `#tentang`, `#karier`, `#blog`, `#faq`, `#kontak`); static copy lives in `lib/landing-copy.ts`. Old routes `/about`, `/services`, `/projects`, `/career`, `/contact` are 308 redirects to those anchors in `next.config.ts`.
 - `app/admin/` — CMS pages (posts, services, portfolio, careers, trusted partners, about, brand). Each entity follows the same pattern: list page + `new/` + `[id]/` pages, backed by `components/admin-*-editor.tsx` / `admin-*-table.tsx` and a REST route in `app/api/admin/<entity>/` (`route.ts` for list/create, `[id]/route.ts` for update/delete).
 - `app/api/upload/presigned/` — returns a MinIO presigned PUT URL; the browser uploads directly (`components/image-upload.tsx`).
 
@@ -42,13 +43,16 @@ Local infra (Postgres on host port **15432**, Dragonfly, MinIO, Keycloak) runs v
 **Public content with fallbacks** (`lib/public-content.ts`, `lib/marketing-data.ts`)
 - `getPublic*()` functions read published rows from Prisma ordered by `sortOrder`; if the table is empty or the DB errors, they return the static defaults in `lib/marketing-data.ts`. Keep both shapes in sync when changing a model.
 - JSON columns (e.g. `details`, `services`, about `body`/`values`) are parsed defensively with helper type guards.
-- Brand logo: `BrandSettings` singleton (`lib/brand.ts`, `lib/brand-settings-db.ts`) with a static fallback.
+- Brand: `BrandSettings` singleton read via `getBrandSettings()` (`lib/brand-settings-db.ts`) — logo, navbar mark, WhatsApp number/message, contact email — with fallbacks in `lib/brand.ts` (the legacy seeded `/brand-logo.svg` is treated as unset). Every CTA goes through `components/landing/contact-button.tsx` → `getContactHref()` (`lib/whatsapp.ts`): WhatsApp if a number is set, else `mailto:`.
+- Pricing: `Service.priceFrom` (nullable, rupiah) shown as "Mulai Rp…" or "Hubungi kami" (`lib/format.ts`). Portfolio filtering matches `PortfolioProject.services` names to `Service.title` (`lib/portfolio.ts`); the admin editor offers them as a checklist.
 
 **Caching / invalidation**
 - Blog uses Redis via `lib/cache.ts` (`getCached`, `invalidateBlogCaches`). Redis is optional: if `REDIS_URL`/`REDIS_HOST` are unset, caching is bypassed. Post mutations must call `invalidateBlogCaches([slugs])` (include the old slug when it changes).
 - Other admin mutations call `revalidatePath(...)` for the affected public pages.
 
 **Images / S3** (`lib/s3.ts`) — path-style MinIO client. Stored URLs may contain the internal Docker hostname `minio`; pass them through `normalizePublicUrlForBrowser` before rendering. Remote image hosts are whitelisted in `next.config.ts`, which also defines the CSP — update `connect-src`/`img-src` there when adding new external origins.
+
+**Visual system**: dark only — palette tokens in `app/globals.css` (`.dark`), Plus Jakarta Sans + Instrument Serif via `next/font` (`--font-jakarta`, `--font-instrument`), helpers `.heading-display`, `.font-serif-accent`, `.text-strike-orange`, marquee keyframes (disabled under `prefers-reduced-motion`).
 
 **Other**: blog content is HTML authored with Tiptap (`components/tiptap-editor.tsx`); posts have a 1:1 `SeoMeta`. Client UI state lives in Zustand (`store/useUIStore.ts`). Path alias `@/*` maps to the repo root.
 

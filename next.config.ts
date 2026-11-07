@@ -26,6 +26,17 @@ const nextConfig: NextConfig = {
     ],
   },
   
+  // Halaman lama digabung ke beranda satu halaman — jaga link lama & hasil Google.
+  async redirects() {
+    return [
+      { source: '/about', destination: '/#tentang', permanent: true },
+      { source: '/services', destination: '/#layanan', permanent: true },
+      { source: '/projects', destination: '/#portofolio', permanent: true },
+      { source: '/career', destination: '/#karier', permanent: true },
+      { source: '/contact', destination: '/#kontak', permanent: true },
+    ];
+  },
+
   // Security headers
   async headers() {
     return [

@@ -81,10 +81,12 @@ export default async function BlogPostPage({
   const updatedAt = new Date(post.updatedAt);
 
   return (
-    <article className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-4xl">
+    <article className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-20 sm:pt-24 max-w-4xl">
       <MotionFadeIn>
         <header className="mb-8">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">{post.title}</h1>
+          <h1 className="heading-display mb-5 text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.02] text-white">
+            {post.title}
+          </h1>
           <div className="flex items-center gap-4 text-muted-foreground mb-6">
             <time dateTime={createdAt.toISOString()}>
               {createdAt.toLocaleDateString("id-ID", {

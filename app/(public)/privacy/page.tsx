@@ -1,6 +1,8 @@
 import { PageHeader } from '@/components/page-header';
+import { getBrandSettings } from '@/lib/brand-settings-db';
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const { contactEmail } = await getBrandSettings();
   return (
     <>
       <PageHeader
@@ -11,8 +13,8 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-foreground text-base font-semibold">Informasi yang kami kumpulkan</h2>
           <p>
-            Ketika Anda mengirim email atau menggunakan formulir kontak di website ini, kami memproses
-            informasi yang Anda berikan (seperti nama, alamat email, dan isi pesan) untuk merespons
+            Ketika Anda menghubungi kami lewat WhatsApp atau email, kami memproses informasi yang Anda
+            berikan (seperti nama, nomor/alamat email, dan isi pesan) untuk merespons
             pertanyaan Anda.
           </p>
         </section>
@@ -35,8 +37,8 @@ export default function PrivacyPage() {
           <h2 className="text-foreground text-base font-semibold">Kontak</h2>
           <p>
             Untuk pertanyaan terkait privasi, silakan hubungi{' '}
-            <a href="mailto:info@rfttech.com" className="text-primary hover:underline">
-              info@rfttech.com
+            <a href={`mailto:${contactEmail}`} className="text-white underline-offset-4 hover:underline">
+              {contactEmail}
             </a>
             .
           </p>

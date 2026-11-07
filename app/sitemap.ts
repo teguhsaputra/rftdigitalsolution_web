@@ -22,17 +22,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // Static pages
-  const staticPaths = [
-    "",
-    "/blog",
-    "/services",
-    "/projects",
-    "/about",
-    "/contact",
-    "/career",
-    "/privacy",
-    "/terms",
-  ];
+  // Halaman lama (about, services, …) sudah jadi section di beranda dan di-redirect.
+  const staticPaths = ["", "/blog", "/privacy", "/terms"];
 
   const staticPages: MetadataRoute.Sitemap = staticPaths.map((path) => ({
     url: `${baseUrl}${path || "/"}`,

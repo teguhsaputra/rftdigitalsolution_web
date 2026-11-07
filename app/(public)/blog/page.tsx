@@ -18,10 +18,12 @@ export default async function BlogPage() {
   }));
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-20 sm:pt-24">
       <MotionFadeIn className="text-center mb-16">
-        <h1 className="text-5xl font-bold mb-4 tracking-tight">Blog</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <h1 className="heading-display mb-5 text-[clamp(2.75rem,7vw,4.5rem)] text-white">
+          Catatan dari <span className="font-serif-accent text-zinc-400">dapur</span> RFT.
+        </h1>
+        <p className="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
           Artikel singkat seputar website, aplikasi, SEO, branding, dan social media dari tim digital agency kami.
         </p>
       </MotionFadeIn>
