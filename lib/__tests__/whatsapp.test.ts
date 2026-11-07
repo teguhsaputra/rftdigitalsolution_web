@@ -25,10 +25,14 @@ describe('buildWhatsAppUrl', () => {
 });
 
 describe('getContactHref', () => {
-  it('uses WA with topic', () =>
+  it('uses WA with topic as a follow-up sentence', () =>
     expect(
       getContactHref({ whatsappNumber: '0812-3456-7890', whatsappMessage: 'Halo RFT', topic: 'Branding' })
-    ).toBe(buildWhatsAppUrl('6281234567890', 'Halo RFT — saya mau tanya paket Branding')));
+    ).toBe(buildWhatsAppUrl('6281234567890', 'Halo RFT. Saya mau tanya paket Branding.')));
+  it('does not double the period after the base message', () =>
+    expect(
+      getContactHref({ whatsappNumber: '6281234567890', whatsappMessage: 'Halo RFT, mau konsultasi.', topic: 'SEO' })
+    ).toBe(buildWhatsAppUrl('6281234567890', 'Halo RFT, mau konsultasi. Saya mau tanya paket SEO.')));
   it('falls back to email', () =>
     expect(getContactHref({ whatsappNumber: '', contactEmail: 'hi@rft.id' })).toBe('mailto:hi@rft.id'));
   it('falls back to #kontak', () => expect(getContactHref({})).toBe('#kontak'));

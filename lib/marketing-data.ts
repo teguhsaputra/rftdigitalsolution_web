@@ -143,7 +143,7 @@ export const portfolioProjects: PortfolioItem[] = [
     focus: 'Mobile Apps • Website',
     description:
       'Aplikasi mobile buat peserta pelatihan — akses materi, cek jadwal, dan terima notifikasi. Plus website marketing untuk akuisisi lead baru.',
-    services: ['Mobile Apps', 'Pembuatan Website'],
+    services: ['Aplikasi Mobile', 'Pembuatan Website'],
   },
   {
     slug: 'klinik-kesehatan',

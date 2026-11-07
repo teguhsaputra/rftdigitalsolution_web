@@ -21,9 +21,9 @@ export function getContactHref(opts: {
   const number = normalizeWhatsAppNumber(opts.whatsappNumber);
   if (number) {
     const base = opts.whatsappMessage?.trim() ?? '';
-    const message = opts.topic
-      ? `${base ? `${base} — ` : ''}saya mau tanya paket ${opts.topic}`
-      : base;
+    const ask = opts.topic ? `Saya mau tanya paket ${opts.topic}.` : '';
+    const lead = base && ask && !/[.!?]$/.test(base) ? `${base}.` : base;
+    const message = [lead, ask].filter(Boolean).join(' ');
     return buildWhatsAppUrl(number, message);
   }
   const email = opts.contactEmail?.trim();
