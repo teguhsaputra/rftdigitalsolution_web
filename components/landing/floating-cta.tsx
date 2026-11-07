@@ -19,7 +19,7 @@ export function FloatingCta({ brand }: { brand: BrandSettingsPublic }) {
 
   return (
     <div
-      aria-hidden={!visible}
+      inert={!visible}
       className={cn(
         'fixed bottom-4 right-4 z-40 flex items-center gap-3 rounded-full border border-white/10 bg-[#18181b]/90 py-1.5 pl-4 pr-1.5 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)] backdrop-blur-md transition-all duration-300 motion-reduce:transition-none',
         visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'

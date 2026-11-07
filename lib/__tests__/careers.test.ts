@@ -4,7 +4,6 @@ const { findMany } = vi.hoisted(() => ({ findMany: vi.fn() }));
 vi.mock('@/lib/prisma', () => ({ prisma: { careerOpening: { findMany } } }));
 
 import { getPublicCareers } from '@/lib/public-content';
-import { careerOpenings } from '@/lib/marketing-data';
 
 describe('getPublicCareers', () => {
   it('returns no openings when the admin has none published (section hides)', async () => {
@@ -12,9 +11,9 @@ describe('getPublicCareers', () => {
     expect(await getPublicCareers()).toEqual([]);
   });
 
-  it('falls back to built-in openings only when the database is unreachable', async () => {
+  it('shows no openings (never sample jobs) when the database is unreachable', async () => {
     findMany.mockRejectedValueOnce(new Error('db down'));
     const result = await getPublicCareers();
-    expect(result).toEqual(careerOpenings);
+    expect(result).toEqual([]);
   });
 });

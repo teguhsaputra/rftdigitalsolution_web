@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
-import { getBrandSettings, upsertBrandSettings } from '@/lib/brand-settings-db';
+import { getBrandFormValues, upsertBrandSettings } from '@/lib/brand-settings-db';
 import { brandSettingsUpdateSchema } from '@/lib/brand-settings-schema';
 import { z } from 'zod';
 
@@ -17,7 +17,7 @@ async function requireAdmin() {
 export async function GET() {
   const deny = await requireAdmin();
   if (deny) return deny;
-  return NextResponse.json(await getBrandSettings());
+  return NextResponse.json(await getBrandFormValues());
 }
 
 export async function PUT(req: NextRequest) {
@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
     await upsertBrandSettings(data);
     // Logo, WA & email dipakai di layout publik dan halaman utama.
     revalidatePath('/', 'layout');
-    return NextResponse.json(await getBrandSettings());
+    return NextResponse.json(await getBrandFormValues());
   } catch (e) {
     if (e instanceof z.ZodError) {
       return NextResponse.json(

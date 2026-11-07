@@ -143,6 +143,7 @@ export async function getPublicCareers(): Promise<CareerOpening[]> {
       responsibilities: asStringArray(r.responsibilities),
     }));
   } catch {
-    return careerOpenings;
+    // Jangan tampilkan lowongan contoh (fiktif) saat database bermasalah.
+    return [];
   }
 }

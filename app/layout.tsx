@@ -38,7 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="dark">
+    <html lang="id" className="dark" suppressHydrationWarning>
+      <head>
+        {/* Tandai JS aktif sebelum paint, supaya animasi reveal tidak menyembunyikan konten tanpa JS. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className={`${jakarta.variable} ${instrument.variable} font-sans antialiased`}>
         {children}
       </body>

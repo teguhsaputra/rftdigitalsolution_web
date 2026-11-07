@@ -35,3 +35,24 @@ describe('resolveBrandSettings', () => {
     expect(r.whatsappNumber).toBe('6281234567890');
   });
 });
+
+import { toBrandFormValues } from '@/lib/brand-settings-db';
+
+describe('toBrandFormValues (admin form)', () => {
+  it('shows unset and legacy values as empty so defaults are never written back', () => {
+    expect(toBrandFormValues({ logoUrl: '/brand-logo.svg', whatsappMessage: null })).toEqual({
+      logoUrl: '',
+      logoMarkUrl: '',
+      whatsappNumber: '',
+      whatsappMessage: '',
+      contactEmail: '',
+    });
+    expect(toBrandFormValues(null).contactEmail).toBe('');
+  });
+
+  it('keeps stored values exactly as saved (no minio→localhost rewrite)', () => {
+    const v = toBrandFormValues({ logoUrl: 'http://minio:9000/b/x.png', contactEmail: 'hi@rft.id' });
+    expect(v.logoUrl).toBe('http://minio:9000/b/x.png');
+    expect(v.contactEmail).toBe('hi@rft.id');
+  });
+});

@@ -47,6 +47,35 @@ export function resolveBrandSettings(row: BrandSettingsInput | null): BrandSetti
   };
 }
 
+/** Nilai mentah untuk form admin: '' = belum diatur (pakai bawaan); tidak ada fallback yang ikut tersimpan. */
+export type BrandFormValues = {
+  logoUrl: string;
+  logoMarkUrl: string;
+  whatsappNumber: string;
+  whatsappMessage: string;
+  contactEmail: string;
+};
+
+export function toBrandFormValues(row: BrandSettingsInput | null): BrandFormValues {
+  const raw = (v: string | null | undefined) => clean(v) ?? '';
+  const image = (v: string | null | undefined) => {
+    const t = raw(v);
+    return LEGACY_LOGO_SRCS.includes(t) ? '' : t;
+  };
+  return {
+    logoUrl: image(row?.logoUrl),
+    logoMarkUrl: image(row?.logoMarkUrl),
+    whatsappNumber: raw(row?.whatsappNumber),
+    whatsappMessage: raw(row?.whatsappMessage),
+    contactEmail: raw(row?.contactEmail),
+  };
+}
+
+export async function getBrandFormValues(): Promise<BrandFormValues> {
+  const row = await prisma.brandSettings.findUnique({ where: { id: BRAND_SETTINGS_ID } });
+  return toBrandFormValues(row);
+}
+
 export async function getBrandSettings(): Promise<BrandSettingsPublic> {
   try {
     const row = await prisma.brandSettings.findUnique({ where: { id: BRAND_SETTINGS_ID } });

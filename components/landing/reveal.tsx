@@ -1,9 +1,13 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
-/** Muncul pelan saat discroll; tanpa animasi bila pengguna memilih reduced motion. */
+/**
+ * Muncul pelan saat discroll. Markup server & client identik (tanpa inline style);
+ * status tersembunyi hanya dipasang lewat CSS bila JS aktif (`html.js`) dan pengguna
+ * tidak memilih reduced motion — lihat `.reveal` di globals.css.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -13,19 +17,38 @@ export function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      // Browser lama: langsung tampilkan.
+      const id = requestAnimationFrame(() => setShown(true));
+      return () => cancelAnimationFrame(id);
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '0px 0px -80px 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      ref={ref}
+      className={cn('reveal', shown && 'is-visible', className)}
+      style={delay ? ({ '--reveal-delay': `${delay}s` } as React.CSSProperties) : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 

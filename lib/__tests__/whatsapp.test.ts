@@ -37,3 +37,10 @@ describe('getContactHref', () => {
     expect(getContactHref({ whatsappNumber: '', contactEmail: 'hi@rft.id' })).toBe('mailto:hi@rft.id'));
   it('falls back to #kontak', () => expect(getContactHref({})).toBe('#kontak'));
 });
+
+describe('normalizeWhatsAppNumber — formats that used to produce broken links', () => {
+  it('adds the country code when the leading 0 is omitted', () =>
+    expect(normalizeWhatsAppNumber('812-3456-7890')).toBe('6281234567890'));
+  it('drops the 0 written after +62', () =>
+    expect(normalizeWhatsAppNumber('+62 0812 3456 7890')).toBe('6281234567890'));
+});

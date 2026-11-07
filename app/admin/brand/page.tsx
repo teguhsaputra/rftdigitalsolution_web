@@ -1,8 +1,8 @@
 import { AdminBrandEditor } from '@/components/admin-brand-editor';
-import { getBrandSettings } from '@/lib/brand-settings-db';
+import { getBrandFormValues } from '@/lib/brand-settings-db';
 
 export default async function AdminBrandPage() {
-  const initial = await getBrandSettings();
+  const initial = await getBrandFormValues();
 
   return (
     <div className="space-y-8">

@@ -3,7 +3,9 @@
 export function normalizeWhatsAppNumber(raw: string | null | undefined): string | null {
   if (!raw) return null;
   let digits = raw.replace(/\D/g, '');
-  if (digits.startsWith('0')) digits = `62${digits.slice(1)}`;
+  if (digits.startsWith('620')) digits = `62${digits.slice(3)}`; // +62 0812…
+  else if (digits.startsWith('0')) digits = `62${digits.slice(1)}`; // 0812…
+  else if (digits.startsWith('8')) digits = `62${digits}`; // 812… tanpa 0
   return digits.length >= 9 ? digits : null;
 }
 
