@@ -51,6 +51,7 @@ export async function seedMarketingContent(prisma: PrismaClient) {
         titleEn: s.titleEn,
         summary: s.summary,
         details: s.details,
+        priceFrom: s.priceFrom,
         sortOrder: sort++,
         published: true,
       },

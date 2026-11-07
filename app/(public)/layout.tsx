@@ -1,6 +1,8 @@
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
-import { getPublicBrandLogoUrl } from '@/lib/public-content';
+import { AnnouncementBar } from '@/components/landing/announcement-bar';
+import { SiteNavbar } from '@/components/landing/site-navbar';
+import { FloatingCta } from '@/components/landing/floating-cta';
+import { ClosingSection } from '@/components/landing/closing-section';
+import { getBrandSettings } from '@/lib/brand-settings-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,15 +11,14 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const brandLogoUrl = await getPublicBrandLogoUrl();
+  const brand = await getBrandSettings();
   return (
     <>
-      <Navbar brandLogoUrl={brandLogoUrl} />
-      <main className="min-h-screen pt-20">
-        {children}
-      </main>
-      <Footer brandLogoUrl={brandLogoUrl} />
+      <AnnouncementBar />
+      <SiteNavbar brand={brand} />
+      <main className="min-h-screen">{children}</main>
+      <ClosingSection brand={brand} />
+      <FloatingCta brand={brand} />
     </>
   );
 }
-
