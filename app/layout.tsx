@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+// Self-hosted (app/fonts, Fontsource latin subset, SIL OFL): next/font/google fetches from Google at
+// build time and broke the GitHub Actions build, so the build no longer needs the network for fonts.
+const jakarta = localFont({
+  src: "./fonts/plus-jakarta-sans-latin-wght-normal.woff2",
+  weight: "200 800",
+  style: "normal",
   variable: "--font-jakarta",
   display: "swap",
 });
 
-const instrument = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+const instrument = localFont({
+  src: [
+    { path: "./fonts/instrument-serif-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/instrument-serif-latin-400-italic.woff2", weight: "400", style: "italic" },
+  ],
   variable: "--font-instrument",
   display: "swap",
 });
