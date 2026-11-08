@@ -1,0 +1,114 @@
+# CI: setiap push / pull request → lint, type-check, unit test, build.
+# CD: push ke main yang lolos CI → image Docker di-build di GitHub (bukan di VPS 2 GB),
+#     dikirim ke VPS Tencent lewat SSH (docker save | docker load), lalu container web di-restart.
+#
+# Secrets repo (Settings → Secrets and variables → Actions):
+#   DEPLOY_SSH_KEY      private key khusus GitHub Actions untuk user deploy di VPS
+#   DEPLOY_KNOWN_HOSTS  output `ssh-keyscan -t ed25519 43.173.51.136`
+#
+# Skema database TIDAK di-push otomatis. Setelah mengubah prisma/schema.prisma jalankan
+# prisma-setup secara manual (lihat deploy/docker-compose.prod.yml).
+# Rollback cepat: di VPS `docker tag native_rft_web:previous native_rft_web:latest` lalu `up -d --no-build`.
+name: CI/CD
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Jangan batalkan run di main: bisa memotong deploy yang sedang berjalan.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  check:
+    name: Lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: Deploy ke VPS Tencent
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://rftdigitalsolution.com
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      DEPLOY_HOST: deploy@43.173.51.136
+      DEPLOY_DIR: /opt/native-apps/rftdigitalsolution_web
+      COMPOSE: docker compose -f deploy/docker-compose.prod.yml --env-file .env
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: native_rft_web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Siapkan SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          echo "SSH=ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+
+      # Kode sumber tetap disinkron: dipakai prisma-setup (db push / seed / admin:create) dan file compose.
+      - name: Sinkron kode
+        run: |
+          rsync -az --delete -e "$SSH" \
+            --exclude node_modules --exclude .next --exclude .git --exclude .github \
+            --exclude .claude --exclude .superpowers \
+            --exclude '.env' --exclude '.env.*' \
+            --exclude minio_data --exclude dragonfly_data \
+            ./ "$DEPLOY_HOST:$DEPLOY_DIR/"
+
+      - name: Kirim image
+        run: |
+          $SSH "$DEPLOY_HOST" 'docker image inspect native_rft_web:latest >/dev/null 2>&1 && docker tag native_rft_web:latest native_rft_web:previous || true'
+          docker save native_rft_web:latest | gzip -1 | $SSH "$DEPLOY_HOST" 'gunzip | docker load'
+
+      - name: Restart & cek kesehatan
+        run: |
+          $SSH "$DEPLOY_HOST" "cd $DEPLOY_DIR && $COMPOSE up -d --no-build && docker image prune -f >/dev/null"
+          for i in $(seq 1 20); do
+            if $SSH "$DEPLOY_HOST" 'docker exec native_rft_web wget -q -O /dev/null http://127.0.0.1:3000/'; then
+              echo "native_rft_web sehat"; exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::native_rft_web tidak merespons setelah deploy"
+          $SSH "$DEPLOY_HOST" 'docker logs --tail 50 native_rft_web'
+          exit 1
