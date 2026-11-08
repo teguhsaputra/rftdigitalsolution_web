@@ -12,7 +12,8 @@ export const BRAND_MARK_FALLBACK_SRC = '/brand-mark.webp';
 export const LEGACY_LOGO_SRCS = ['/brand-logo.svg'];
 
 export const DEFAULT_WHATSAPP_MESSAGE = 'Halo RFT, saya mau konsultasi soal project digital.';
-export const DEFAULT_CONTACT_EMAIL = 'info@rfttech.com';
+/** Email hanya untuk keperluan yang memang butuh email (mis. permintaan privasi); kontak utama = WhatsApp. */
+export const BRAND_EMAIL = 'rftdigitalsolution@gmail.com';
 
 /** Single row id untuk settings brand. */
 export const BRAND_SETTINGS_ID = 'default';

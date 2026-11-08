@@ -1,4 +1,4 @@
-/** Helpers untuk tombol WhatsApp (link wa.me) dengan fallback ke email. */
+/** Helpers untuk tombol WhatsApp (link wa.me). WhatsApp satu-satunya kanal kontak — tidak ada email. */
 
 export function normalizeWhatsAppNumber(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -17,7 +17,6 @@ export function buildWhatsAppUrl(number: string, message?: string): string {
 export function getContactHref(opts: {
   whatsappNumber?: string | null;
   whatsappMessage?: string | null;
-  contactEmail?: string | null;
   topic?: string;
 }): string {
   const number = normalizeWhatsAppNumber(opts.whatsappNumber);
@@ -28,7 +27,5 @@ export function getContactHref(opts: {
     const message = [lead, ask].filter(Boolean).join(' ');
     return buildWhatsAppUrl(number, message);
   }
-  const email = opts.contactEmail?.trim();
-  if (email) return `mailto:${email}`;
   return '#kontak';
 }

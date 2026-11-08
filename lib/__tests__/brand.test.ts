@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 vi.mock('@/lib/prisma', () => ({ prisma: {} }));
 
 import { resolveBrandSettings } from '@/lib/brand-settings-db';
-import { DEFAULT_CONTACT_EMAIL, DEFAULT_WHATSAPP_MESSAGE } from '@/lib/brand';
+import { DEFAULT_WHATSAPP_MESSAGE } from '@/lib/brand';
 
 describe('resolveBrandSettings', () => {
   it('uses fallbacks when there is no row', () => {
@@ -12,7 +12,6 @@ describe('resolveBrandSettings', () => {
       logoMarkUrl: '/brand-mark.webp',
       whatsappNumber: null,
       whatsappMessage: DEFAULT_WHATSAPP_MESSAGE,
-      contactEmail: DEFAULT_CONTACT_EMAIL,
     });
   });
 
@@ -28,9 +27,10 @@ describe('resolveBrandSettings', () => {
     );
   });
 
-  it('defaults empty email/message and keeps the stored number', () => {
-    const r = resolveBrandSettings({ whatsappNumber: '6281234567890', contactEmail: '', whatsappMessage: '' });
-    expect(r.contactEmail).toBe(DEFAULT_CONTACT_EMAIL);
+  it('defaults an empty message, keeps the stored number and never exposes an email', () => {
+    const legacyRow = { whatsappNumber: '6281234567890', contactEmail: 'old@rft.id', whatsappMessage: '' };
+    const r = resolveBrandSettings(legacyRow);
+    expect(r).not.toHaveProperty('contactEmail');
     expect(r.whatsappMessage).toBe(DEFAULT_WHATSAPP_MESSAGE);
     expect(r.whatsappNumber).toBe('6281234567890');
   });
@@ -45,14 +45,11 @@ describe('toBrandFormValues (admin form)', () => {
       logoMarkUrl: '',
       whatsappNumber: '',
       whatsappMessage: '',
-      contactEmail: '',
     });
-    expect(toBrandFormValues(null).contactEmail).toBe('');
   });
 
   it('keeps stored values exactly as saved (no minio→localhost rewrite)', () => {
-    const v = toBrandFormValues({ logoUrl: 'http://minio:9000/b/x.png', contactEmail: 'hi@rft.id' });
+    const v = toBrandFormValues({ logoUrl: 'http://minio:9000/b/x.png' });
     expect(v.logoUrl).toBe('http://minio:9000/b/x.png');
-    expect(v.contactEmail).toBe('hi@rft.id');
   });
 });

@@ -1,8 +1,10 @@
 import { PageHeader } from '@/components/page-header';
 import { getBrandSettings } from '@/lib/brand-settings-db';
+import { getContactHref } from '@/lib/whatsapp';
+import { BRAND_EMAIL } from '@/lib/brand';
 
 export default async function PrivacyPage() {
-  const { contactEmail } = await getBrandSettings();
+  const contactHref = getContactHref(await getBrandSettings());
   return (
     <>
       <PageHeader
@@ -13,8 +15,8 @@ export default async function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-foreground text-base font-semibold">Informasi yang kami kumpulkan</h2>
           <p>
-            Ketika Anda menghubungi kami lewat WhatsApp atau email, kami memproses informasi yang Anda
-            berikan (seperti nama, nomor/alamat email, dan isi pesan) untuk merespons
+            Ketika Anda menghubungi kami lewat WhatsApp, kami memproses informasi yang Anda
+            berikan (seperti nama, nomor WhatsApp, dan isi pesan) untuk merespons
             pertanyaan Anda.
           </p>
         </section>
@@ -36,9 +38,18 @@ export default async function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-foreground text-base font-semibold">Kontak</h2>
           <p>
-            Untuk pertanyaan terkait privasi, silakan hubungi{' '}
-            <a href={`mailto:${contactEmail}`} className="text-white underline-offset-4 hover:underline">
-              {contactEmail}
+            Untuk pertanyaan terkait privasi, silakan{' '}
+            <a
+              href={contactHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white underline-offset-4 hover:underline"
+            >
+              hubungi kami lewat WhatsApp
+            </a>{' '}
+            atau kirim email ke{' '}
+            <a href={`mailto:${BRAND_EMAIL}`} className="text-white underline-offset-4 hover:underline">
+              {BRAND_EMAIL}
             </a>
             .
           </p>

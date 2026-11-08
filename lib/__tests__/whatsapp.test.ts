@@ -33,8 +33,10 @@ describe('getContactHref', () => {
     expect(
       getContactHref({ whatsappNumber: '6281234567890', whatsappMessage: 'Halo RFT, mau konsultasi.', topic: 'SEO' })
     ).toBe(buildWhatsAppUrl('6281234567890', 'Halo RFT, mau konsultasi. Saya mau tanya paket SEO.')));
-  it('falls back to email', () =>
-    expect(getContactHref({ whatsappNumber: '', contactEmail: 'hi@rft.id' })).toBe('mailto:hi@rft.id'));
+  it('never falls back to email (WhatsApp is the only contact channel)', () => {
+    const legacyRow = { whatsappNumber: '', contactEmail: 'hi@rft.id' };
+    expect(getContactHref(legacyRow)).toBe('#kontak');
+  });
   it('falls back to #kontak', () => expect(getContactHref({})).toBe('#kontak'));
 });
 

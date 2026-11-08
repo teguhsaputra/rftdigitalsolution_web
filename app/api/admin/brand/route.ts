@@ -26,7 +26,7 @@ export async function PUT(req: NextRequest) {
   try {
     const data = brandSettingsUpdateSchema.parse(await req.json());
     await upsertBrandSettings(data);
-    // Logo, WA & email dipakai di layout publik dan halaman utama.
+    // Logo & WA dipakai di layout publik dan halaman utama.
     revalidatePath('/', 'layout');
     return NextResponse.json(await getBrandFormValues());
   } catch (e) {

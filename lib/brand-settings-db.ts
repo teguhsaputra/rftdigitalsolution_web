@@ -5,7 +5,6 @@ import {
   BRAND_LOGO_FALLBACK_SRC,
   BRAND_MARK_FALLBACK_SRC,
   BRAND_SETTINGS_ID,
-  DEFAULT_CONTACT_EMAIL,
   DEFAULT_WHATSAPP_MESSAGE,
   LEGACY_LOGO_SRCS,
 } from '@/lib/brand';
@@ -15,7 +14,6 @@ export type BrandSettingsPublic = {
   logoMarkUrl: string;
   whatsappNumber: string | null;
   whatsappMessage: string;
-  contactEmail: string;
 };
 
 type BrandSettingsInput = {
@@ -23,7 +21,6 @@ type BrandSettingsInput = {
   logoMarkUrl?: string | null;
   whatsappNumber?: string | null;
   whatsappMessage?: string | null;
-  contactEmail?: string | null;
 };
 
 function clean(v: string | null | undefined): string | null {
@@ -44,7 +41,6 @@ export function resolveBrandSettings(row: BrandSettingsInput | null): BrandSetti
     logoMarkUrl: imageOr(row?.logoMarkUrl, BRAND_MARK_FALLBACK_SRC),
     whatsappNumber: clean(row?.whatsappNumber),
     whatsappMessage: clean(row?.whatsappMessage) ?? DEFAULT_WHATSAPP_MESSAGE,
-    contactEmail: clean(row?.contactEmail) ?? DEFAULT_CONTACT_EMAIL,
   };
 }
 
@@ -54,7 +50,6 @@ export type BrandFormValues = {
   logoMarkUrl: string;
   whatsappNumber: string;
   whatsappMessage: string;
-  contactEmail: string;
 };
 
 export function toBrandFormValues(row: BrandSettingsInput | null): BrandFormValues {
@@ -68,7 +63,6 @@ export function toBrandFormValues(row: BrandSettingsInput | null): BrandFormValu
     logoMarkUrl: image(row?.logoMarkUrl),
     whatsappNumber: raw(row?.whatsappNumber),
     whatsappMessage: raw(row?.whatsappMessage),
-    contactEmail: raw(row?.contactEmail),
   };
 }
 

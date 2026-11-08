@@ -24,7 +24,6 @@ export const brandSettingsUpdateSchema = z.object({
   logoMarkUrl: imageRef.optional(),
   whatsappNumber: whatsappNumber.optional(),
   whatsappMessage: z.string().trim().max(500).optional(),
-  contactEmail: z.union([z.literal(''), z.string().trim().email('Email tidak valid')]).optional(),
 });
 
 export type BrandSettingsUpdate = z.infer<typeof brandSettingsUpdateSchema>;

@@ -88,6 +88,7 @@ model BrandSettings {
   logoMarkUrl     String?
   whatsappNumber  String?
   whatsappMessage String?
+  /// Tidak dipakai lagi: website hanya memakai WhatsApp sebagai kontak.
   contactEmail    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

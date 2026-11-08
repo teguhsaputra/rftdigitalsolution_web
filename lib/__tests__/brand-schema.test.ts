@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { brandSettingsUpdateSchema } from '@/lib/brand-settings-schema';
 
 describe('brandSettingsUpdateSchema', () => {
-  it('saves WA/email without any logo and normalizes the number', () => {
+  it('saves WA without any logo, normalizes the number and drops a contact email', () => {
     const r = brandSettingsUpdateSchema.parse({ whatsappNumber: '0812-3456-7890', contactEmail: 'hi@rft.id' });
-    expect(r).toEqual({ whatsappNumber: '6281234567890', contactEmail: 'hi@rft.id' });
+    expect(r).toEqual({ whatsappNumber: '6281234567890' });
   });
 
   it('accepts empty strings, relative paths and full URLs for logos', () => {
@@ -24,9 +24,6 @@ describe('brandSettingsUpdateSchema', () => {
     expect(brandSettingsUpdateSchema.parse({ whatsappNumber: '' })).toEqual({ whatsappNumber: '' });
   });
 
-  it('rejects an invalid email', () => {
-    expect(brandSettingsUpdateSchema.safeParse({ contactEmail: 'nope' }).success).toBe(false);
-  });
 });
 
 it('rejects protocol-relative logo URLs that point to another host', () => {

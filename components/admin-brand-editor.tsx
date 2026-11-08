@@ -13,7 +13,6 @@ import type { BrandFormValues } from '@/lib/brand-settings-db';
 import {
   BRAND_LOGO_FALLBACK_SRC,
   BRAND_MARK_FALLBACK_SRC,
-  DEFAULT_CONTACT_EMAIL,
   DEFAULT_WHATSAPP_MESSAGE,
 } from '@/lib/brand';
 
@@ -46,7 +45,6 @@ export function AdminBrandEditor({ initial }: { initial: BrandFormValues }) {
       return;
     }
     setValue('whatsappNumber', json.whatsappNumber ?? '');
-    setValue('contactEmail', json.contactEmail ?? '');
     setValue('whatsappMessage', json.whatsappMessage ?? '');
     setSaved(true);
     router.refresh();
@@ -58,8 +56,8 @@ export function AdminBrandEditor({ initial }: { initial: BrandFormValues }) {
         <CardHeader>
           <CardTitle>Kontak & WhatsApp</CardTitle>
           <CardDescription>
-            Semua tombol &quot;Chat WhatsApp&quot; di website memakai nomor ini. Jika nomor kosong,
-            tombol beralih ke email.
+            Semua tombol &quot;Chat WhatsApp&quot; di website memakai nomor ini. WhatsApp adalah
+            satu-satunya kontak yang ditampilkan di website.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -79,16 +77,6 @@ export function AdminBrandEditor({ initial }: { initial: BrandFormValues }) {
               placeholder={DEFAULT_WHATSAPP_MESSAGE}
               {...register('whatsappMessage')}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="contactEmail">Email kontak</Label>
-            <Input
-              id="contactEmail"
-              type="email"
-              placeholder={DEFAULT_CONTACT_EMAIL}
-              {...register('contactEmail')}
-            />
-            <p className="text-xs text-muted-foreground">Kosongkan untuk memakai bawaan.</p>
           </div>
         </CardContent>
       </Card>

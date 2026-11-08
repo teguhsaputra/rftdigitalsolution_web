@@ -4,7 +4,6 @@ import type { BrandSettingsPublic } from '@/lib/brand-settings-db';
 import { BRAND_LOGO_ALT, BRAND_NAME } from '@/lib/brand';
 import { closing } from '@/lib/landing-copy';
 import { ContactButton } from '@/components/landing/contact-button';
-import { normalizeWhatsAppNumber } from '@/lib/whatsapp';
 
 const footerLinks = [
   { href: '/#layanan', label: 'Layanan' },
@@ -17,7 +16,6 @@ const footerLinks = [
 /** Section penutup + footer (id="kontak"). */
 export function ClosingSection({ brand }: { brand: BrandSettingsPublic }) {
   const year = new Date().getFullYear();
-  const hasWhatsApp = normalizeWhatsAppNumber(brand.whatsappNumber) !== null;
 
   return (
     <footer
@@ -39,20 +37,12 @@ export function ClosingSection({ brand }: { brand: BrandSettingsPublic }) {
       </h2>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <ContactButton brand={brand} label={closing.primaryCta} arrow />
-        {hasWhatsApp && (
-          <a
-            href={`mailto:${brand.contactEmail}`}
-            className="inline-flex items-center justify-center rounded-full border border-zinc-700 px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/5"
-          >
-            {closing.emailCta}
-          </a>
-        )}
       </div>
       <p className="mt-4 text-xs text-zinc-500">{closing.note}</p>
 
       <div className="mx-auto mt-16 flex max-w-5xl flex-col items-center justify-between gap-4 border-t border-line pt-6 text-xs text-zinc-500 sm:flex-row">
         <span>
-          © {year} {BRAND_NAME} · {brand.contactEmail}
+          © {year} {BRAND_NAME}
         </span>
         <nav aria-label="Footer" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
           {footerLinks.map((l) => (

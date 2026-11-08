@@ -143,7 +143,6 @@ export const closing = {
   accent: 'naik kelas',
   lineEnd: '?',
   primaryCta: 'Chat WhatsApp',
-  emailCta: 'Kirim email',
   note: 'Konsultasi gratis · tanpa kewajiban · balas di jam kerja',
 };
 
