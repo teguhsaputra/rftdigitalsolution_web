@@ -4,7 +4,7 @@
 #
 # Secrets repo (Settings → Secrets and variables → Actions):
 #   DEPLOY_SSH_KEY      private key khusus GitHub Actions untuk user deploy di VPS
-#   DEPLOY_KNOWN_HOSTS  output `ssh-keyscan -t ed25519 43.173.51.136`
+# Host key VPS dipatok di DEPLOY_HOST_KEY (bukan rahasia; fingerprint SHA256:nSkfn/zXZivLaLltevPtYMD+uayLkJ6Zb2I5FKaXFaI).
 #
 # Skema database TIDAK di-push otomatis. Setelah mengubah prisma/schema.prisma jalankan
 # prisma-setup secara manual (lihat deploy/docker-compose.prod.yml).
@@ -61,6 +61,7 @@ jobs:
       cancel-in-progress: false
     env:
       DEPLOY_HOST: deploy@43.173.51.136
+      DEPLOY_HOST_KEY: 43.173.51.136 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF4BbCoQIh9CclRoVYJy12aLDH/WBmhRAKGd2xnjQOOz
       DEPLOY_DIR: /opt/native-apps/rftdigitalsolution_web
       COMPOSE: docker compose -f deploy/docker-compose.prod.yml --env-file .env
     steps:
@@ -82,7 +83,10 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          if ! grep -q "PRIVATE KEY" ~/.ssh/deploy_key; then
+            echo "::error::Secret DEPLOY_SSH_KEY kosong/tidak valid"; exit 1
+          fi
+          printf '%s\n' "$DEPLOY_HOST_KEY" > ~/.ssh/known_hosts
           echo "SSH=ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
 
       # Kode sumber tetap disinkron: dipakai prisma-setup (db push / seed / admin:create) dan file compose.
