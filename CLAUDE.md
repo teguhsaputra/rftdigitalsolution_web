@@ -26,6 +26,8 @@ Unit tests cover the pure helpers in `lib/` (WhatsApp links, price formatting, b
 
 Local infra (Postgres on host port **15432**, Redis, MinIO) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_MINIO.md` for service setup and troubleshooting.
 
+**Production (Tencent VPS)**: `deploy/docker-compose.prod.yml` (web + Redis only). It uses the VPS's **shared Postgres** (`smartles_db`, role `rft`, database `rft_blog`, via the external network `smartles_internal`) and the shared MinIO/Caddy; never add a Postgres service. Push to `main` → `.github/workflows/ci-cd.yml` runs lint/tsc/test/build, builds the image on GitHub and ships it over SSH (`docker save | docker load`). Schema changes are applied manually with the `prisma-setup` tools service. `deploy/deploy.sh` is the manual rsync fallback (it deploys the local working tree).
+
 ## Architecture
 
 **Route groups**
