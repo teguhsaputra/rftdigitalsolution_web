@@ -3,12 +3,16 @@ import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
 import { authenticateAdmin, refreshAdminToken } from './lib/admin-auth';
 import { env } from './lib/env';
+import { checkLoginRateLimit, clientIpFromHeaders, redisRateLimitStore } from './lib/login-rate-limit';
 
 class InvalidLogin extends CredentialsSignin {
   code = 'invalid';
 }
 class LockedLogin extends CredentialsSignin {
   code = 'locked';
+}
+class RateLimitedLogin extends CredentialsSignin {
+  code = 'ratelimited';
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -17,7 +21,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: { email: { type: 'email' }, password: { type: 'password' } },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
+        // Batas per IP dicek sebelum akun disentuh: menahan brute force & beban scrypt dari satu IP.
+        if (!(await checkLoginRateLimit(clientIpFromHeaders(request.headers), redisRateLimitStore()))) {
+          throw new RateLimitedLogin();
+        }
         const result = await authenticateAdmin(
           String(credentials?.email ?? ''),
           String(credentials?.password ?? '')

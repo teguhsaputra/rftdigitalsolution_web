@@ -11,12 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BRAND_MARK_FALLBACK_SRC, BRAND_SHORT_NAME } from '@/lib/brand';
 import { LOCK_MINUTES } from '@/lib/admin-auth-constants';
+import { LOGIN_IP_WINDOW_SECONDS } from '@/lib/login-rate-limit-constants';
 import { safeCallbackPath } from '@/lib/safe-redirect';
 
 
 const messages: Record<string, string> = {
   invalid: 'Email atau password salah.',
   locked: `Terlalu banyak percobaan gagal. Akun dikunci sementara ${LOCK_MINUTES} menit.`,
+  ratelimited: `Terlalu banyak percobaan login dari jaringan Anda. Coba lagi dalam ${LOGIN_IP_WINDOW_SECONDS / 60} menit.`,
   default: 'Login gagal. Coba lagi beberapa saat lagi.',
 };
 
