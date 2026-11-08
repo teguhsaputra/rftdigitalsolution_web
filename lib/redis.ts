@@ -9,8 +9,7 @@ export function isRedisConfigured(): boolean {
 }
 
 /**
- * Get or create a Redis/DragonflyDB client instance.
- * DragonflyDB is Redis-compatible and uses the same connection protocol.
+ * Get or create a Redis client instance.
  * 
  * Connection URL format: redis://:password@host:port
  */
@@ -26,8 +25,7 @@ export function getRedisClient(): Redis {
   const redisUrl = env.REDIS_URL;
   const redisPassword = env.REDIS_PASSWORD;
 
-  // Configuration for Redis/DragonflyDB connection
-  // DragonflyDB is fully Redis-compatible, so ioredis works seamlessly
+  // Configuration for Redis connection
   const redisConfig: RedisOptions = {
     maxRetriesPerRequest: 3,
     retryStrategy: (times: number) => {
@@ -56,22 +54,22 @@ export function getRedisClient(): Redis {
   }
 
   redisClient.on('error', (err) => {
-    console.error('DragonflyDB/Redis Client Error:', err);
+    console.error('Redis Client Error:', err);
   });
 
   redisClient.on('connect', () => {
-    console.log('DragonflyDB/Redis Client Connected');
+    console.log('Redis Client Connected');
   });
 
   redisClient.on('ready', () => {
-    console.log('DragonflyDB/Redis Client Ready');
+    console.log('Redis Client Ready');
   });
 
   return redisClient;
 }
 
 /**
- * Close the Redis/DragonflyDB connection gracefully
+ * Close the Redis connection gracefully
  */
 export async function closeRedisConnection(): Promise<void> {
   if (redisClient) {

@@ -28,7 +28,7 @@ const envSchema = z
     // Canonical site URL for Auth.js redirects (e.g. http://localhost:3000 or https://your-domain.com)
     AUTH_URL: z.string().url().optional(),
 
-    // Redis/DragonflyDB Configuration
+    // Redis configuration (optional — caching is skipped when unset)
     REDIS_URL: z.string().url().optional(),
     REDIS_HOST: z.string().optional(),
     REDIS_PORT: z.string().regex(/^\d+$/).transform(Number).optional(),

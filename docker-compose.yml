@@ -3,19 +3,19 @@
 #
 # Publish port ke host (lanjut setelah 8090 = native_jkt_pos_pma di srv673856):
 #   8091 → Next.js (3000) | native_rft_web
-#   8092 → Dragonfly (6379)  | native_rft_cache
+#   8092 → Redis (6379)      | native_rft_cache
 #   8093 → MinIO S3 (9000)    | native_rft_minio
 #   8094 → MinIO Console (9001)
 # Postgres tidak di-publish (hanya jaringan internal).
 # Nginx Proxy Manager: upstream ke IP host + port di atas (atau hostname Docker di global-net).
 #
 # Domain (HTTPS di reverse proxy → container):
-#   rftdigitalsolution.com | s3.* | s3-ui.* | dragonfly.*
+#   rftdigitalsolution.com | s3.* | s3-ui.*
 # Lihat .env untuk MINIO_SERVER_URL, MINIO_BROWSER_REDIRECT_URL.
 #
 # Jaringan:
 # - native_rft_network: semua service (komunikasi internal).
-# - global-net: reverse proxy / app lain yang perlu upstream ke web, MinIO, Dragonfly.
+# - global-net: reverse proxy / app lain yang perlu upstream ke web, MinIO, Redis.
 #   Postgres tetap hanya native_rft_network.
 #
 # Skema DB pertama kali / setelah ubah schema Prisma (dari folder project di server):
@@ -65,17 +65,12 @@ services:
       - global-net
 
   cache:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    # Redis hanya untuk cache blog: tanpa persistensi, RAM dibatasi 64 MB.
+    image: redis:7.4-alpine
     container_name: native_rft_cache
-    command: dragonfly --requirepass ${REDIS_PASSWORD}
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru", "--save", "", "--appendonly", "no"]
     ports:
       - "8092:6379"
-    volumes:
-      - ./dragonfly_data:/data
-    ulimits:
-      memlock: -1
     restart: unless-stopped
     networks:
       - native_rft_network

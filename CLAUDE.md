@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Corporate website + CMS for PT. RFT Digital Solution. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with email + password admin accounts (no external identity provider), DragonflyDB (Redis-compatible) cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
+Corporate website + CMS for PT. RFT Digital Solution. Next.js 16 (App Router, React 19), TypeScript, Tailwind v4 + shadcn/ui, Prisma (PostgreSQL 15), Auth.js v5 with email + password admin accounts (no external identity provider), Redis cache, MinIO (S3) for images. UI copy and many code comments are in Indonesian.
 
 ## Commands
 
@@ -24,7 +24,7 @@ npm run admin:create -- --email a@b.com --name "Nama"   # create/reset an admin 
 
 Unit tests cover the pure helpers in `lib/` (WhatsApp links, price formatting, brand settings resolution, portfolio filter, redirects). UI is verified with `npm run lint` + `npm run build`. `npm run build` needs a `DATABASE_URL`; without a DB use `DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy` (same as the Dockerfile).
 
-Local infra (Postgres on host port **15432**, Dragonfly, MinIO) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_MINIO.md` for service setup and troubleshooting.
+Local infra (Postgres on host port **15432**, Redis, MinIO) runs via `docker-compose -f docker-compose.dev.yml up -d`; Next.js runs on the host with `npm run dev`. `docker-compose.yml` is the production stack (requires external `global-net` network; schema push via `docker compose --profile tools run --rm prisma-setup` or `scripts/prod-prisma-push.sh`). See `SETUP_MINIO.md` for service setup and troubleshooting.
 
 ## Architecture
 

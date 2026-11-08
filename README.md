@@ -10,7 +10,7 @@ A high-performance, secure, and visually stunning corporate website built with N
 - **State Management:** Zustand
 - **Validation:** Zod
 - **Animations:** Framer Motion
-- **Caching:** DragonflyDB (Redis-compatible, multi-threaded)
+- **Caching:** Redis 7 (blog cache only, optional)
 - **Database:** PostgreSQL 15
 - **Authentication:** Auth.js (email + password admin accounts stored in PostgreSQL)
 - **Object Storage:** MinIO (S3-compatible)
@@ -21,7 +21,7 @@ A high-performance, secure, and visually stunning corporate website built with N
 - Node.js 20 or higher
 - npm or yarn
 - Docker and Docker Compose (for containerized deployment)
-- DragonflyDB (runs in Docker, Redis-compatible)
+- Redis (runs in Docker)
 
 ## 🛠️ Setup Instructions
 
@@ -45,7 +45,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/rft_blog
 # Authentication
 AUTH_SECRET=your-32-character-secret-here-minimum
 
-# DragonflyDB Configuration (Redis-compatible)
+# Redis Configuration (optional; without it caching is skipped)
 REDIS_URL=redis://:your-password@localhost:6379
 REDIS_PASSWORD=your-secure-redis-password-change-this
 
@@ -85,7 +85,7 @@ npm start
 
 ### Using Docker Compose (Recommended)
 
-This will start both the Next.js application and DragonflyDB:
+This will start the Next.js application, PostgreSQL, Redis and MinIO:
 
 ```bash
 docker-compose up -d
@@ -107,12 +107,12 @@ Build the image:
 docker build -t rft-website .
 ```
 
-Run the container (requires DragonflyDB to be running separately):
+Run the container (requires Redis to be running separately):
 
 ```bash
 docker run -p 3000:3000 \
-  -e REDIS_URL=redis://:your-password@your-dragonfly-host:6379 \
-  -e REDIS_PASSWORD=your-dragonfly-password \
+  -e REDIS_URL=redis://:your-password@your-redis-host:6379 \
+  -e REDIS_PASSWORD=your-redis-password \
   rft-website
 ```
 
@@ -132,7 +132,7 @@ docker run -p 3000:3000 \
 │   └── trusted-by-section.tsx # Client marquee
 ├── lib/                   # Utility libraries
 │   ├── env.ts            # Environment variable validation (Zod)
-│   ├── redis.ts          # DragonflyDB/Redis client initialization
+│   ├── redis.ts          # Redis client initialization
 │   └── utils.ts          # Utility functions
 ├── store/                 # Zustand stores
 │   └── useUIStore.ts     # UI state management
@@ -166,15 +166,13 @@ The website features a premium dark mode design with:
 
 ## 🔧 Configuration
 
-### DragonflyDB Connection
+### Redis Connection
 
-The application uses DragonflyDB (Redis-compatible, multi-threaded) for caching. Configure the connection via environment variables:
+The application uses Redis to cache blog queries (60 s TTL). Redis is optional: if neither `REDIS_URL` nor `REDIS_HOST` is set, caching is skipped. The Docker setups run `redis:7.4-alpine` without persistence and with a 64 MB memory cap (LRU eviction). Configure the connection via environment variables:
 
 - `REDIS_URL`: Full connection URL with password (e.g., `redis://:password@localhost:6379`)
 - `REDIS_HOST` & `REDIS_PORT`: Alternative to REDIS_URL
-- `REDIS_PASSWORD`: Required password for DragonflyDB authentication
-
-**Note:** Variable names use "REDIS" prefix for compatibility, but the application uses DragonflyDB which is fully Redis-compatible. All Redis commands work seamlessly with DragonflyDB.
+- `REDIS_PASSWORD`: Password for Redis authentication
 
 ### Next.js Configuration
 
