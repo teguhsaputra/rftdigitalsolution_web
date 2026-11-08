@@ -83,21 +83,15 @@ npm start
 
 ## 🐳 Docker Deployment
 
-### Using Docker Compose (Recommended)
+### Production (Tencent VPS)
 
-This will start the Next.js application, PostgreSQL, Redis and MinIO:
+Production runs from `deploy/docker-compose.prod.yml` (Next.js + Redis only). Postgres, MinIO and the
+Caddy reverse proxy are shared services managed by the infra repo
+[tencent-infra](https://github.com/teguhsaputra/tencent-infra). Push to `main` deploys via GitHub Actions;
+`deploy/deploy.sh` is the manual fallback. See the header of `deploy/docker-compose.prod.yml` for the
+schema-push and admin commands.
 
-```bash
-docker-compose up -d
-```
-
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-To stop the containers:
-
-```bash
-docker-compose down
-```
+For local services (Postgres, Redis, MinIO) use `docker-compose -f docker-compose.dev.yml up -d`.
 
 ### Using Docker Only
 
@@ -137,7 +131,8 @@ docker run -p 3000:3000 \
 ├── store/                 # Zustand stores
 │   └── useUIStore.ts     # UI state management
 ├── Dockerfile            # Multi-stage Docker build
-├── docker-compose.yml    # Docker Compose configuration
+├── docker-compose.dev.yml # Local services (Postgres, Redis, MinIO)
+├── deploy/               # Production compose + manual deploy script
 └── next.config.ts        # Next.js configuration with security headers
 ```
 

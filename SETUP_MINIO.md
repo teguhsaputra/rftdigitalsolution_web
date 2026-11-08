@@ -6,7 +6,7 @@
 
 1. Start Docker services:
    ```bash
-   docker-compose up -d
+   docker-compose -f docker-compose.dev.yml up -d
    ```
 
 2. Open your browser and navigate to: `http://localhost:9001`
