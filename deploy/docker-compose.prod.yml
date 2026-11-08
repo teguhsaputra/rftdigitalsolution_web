@@ -1,0 +1,97 @@
+# Produksi di VPS Tencent Jakarta (43.173.51.136), folder /opt/native-apps/rftdigitalsolution_web.
+# HTTPS ditangani Caddy bersama (/opt/native-apps/caddy) lewat jaringan Docker eksternal `proxy`:
+#   rftdigitalsolution.com    -> native_rft_web:3000
+#   s3.rftdigitalsolution.com -> minio:9000   (MinIO BERSAMA di /opt/native-apps/minio, bucket rft-blog-images)
+# Tidak ada port yang dibuka ke internet. Kredensial S3 (user `rft`, hanya bisa akses bucket-nya sendiri)
+# dibuat dengan /opt/native-apps/minio/add-project.sh dan disimpan di .env.
+#
+#   docker compose -f deploy/docker-compose.prod.yml --env-file .env up -d --build
+#
+# Sinkron skema Prisma (project memakai db push, tanpa folder migrations):
+#   docker compose -f deploy/docker-compose.prod.yml --env-file .env --profile tools run --rm prisma-setup
+# Buat / reset akun admin:
+#   docker compose -f deploy/docker-compose.prod.yml --env-file .env --profile tools run --rm prisma-setup \
+#     sh -c "npm ci && npm run admin:create -- --email nama@domain.com --name 'Nama'"
+name: rftdigitalsolution_web
+
+services:
+  nextjs:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: native_rft_web:latest
+    container_name: native_rft_web
+    restart: unless-stopped
+    environment:
+      HOSTNAME: 0.0.0.0
+      NODE_ENV: production
+      AUTH_SECRET: ${AUTH_SECRET:?isi AUTH_SECRET}
+      AUTH_URL: ${AUTH_URL:?isi AUTH_URL}
+      NEXTAUTH_URL: ${AUTH_URL}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-${AUTH_URL}}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@cache:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?isi REDIS_PASSWORD}
+      S3_ENDPOINT: ${S3_ENDPOINT:?isi S3_ENDPOINT}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?isi S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?isi S3_SECRET_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:?isi S3_BUCKET_NAME}
+      S3_REGION: ${S3_REGION:-us-east-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    networks: [internal, proxy]
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: native_rft_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?isi POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:?isi POSTGRES_DB}
+    # hemat RAM untuk VPS 2 GB
+    command: ["postgres", "-c", "shared_buffers=32MB", "-c", "max_connections=40"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  cache:
+    # Redis hanya untuk cache blog (TTL 60 dtk): tanpa persistensi, RAM dibatasi 64 MB.
+    image: redis:7.4-alpine
+    container_name: native_rft_cache
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru", "--save", "", "--appendonly", "no"]
+    networks: [internal]
+
+  # Alat sekali pakai: prisma db push / seed / admin:create (image produksi tidak berisi Prisma CLI).
+  prisma-setup:
+    image: node:20-bookworm-slim
+    profiles: [tools]
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal]
+    command: sh -c "npm ci && npx prisma generate && npx prisma db push"
+
+volumes:
+  postgres-data:
+
+networks:
+  internal:
+  proxy:
+    external: true
