@@ -10,7 +10,6 @@ function fakePrisma(existingPartnerNames: string[]) {
     brandSettings: { upsert, updateMany },
     aboutPage: { upsert },
     service: { upsert },
-    careerOpening: { upsert },
     portfolioProject: { upsert, updateMany },
     trustedPartner: {
       findFirst: vi.fn(async ({ where }: { where: { name: string } }) =>
@@ -29,6 +28,11 @@ describe('seedMarketingContent', () => {
     const created = prisma.trustedPartner.create.mock.calls.map((c) => c[0].data.name);
     expect(created).toHaveLength(trustedPartners.length - 1);
     expect(created).not.toContain('Reliprove');
+  });
+
+  it('does not seed career openings (careers feature removed)', async () => {
+    const { prisma } = fakePrisma([]);
+    await expect(seedMarketingContent(prisma as unknown as PrismaClient)).resolves.not.toThrow();
   });
 
   it('hides the old fictional sample projects', async () => {

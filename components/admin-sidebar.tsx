@@ -12,7 +12,6 @@ import {
   Briefcase,
   Layers,
   Info,
-  Users,
   Handshake,
   Image as ImageIcon,
   ShieldCheck,
@@ -29,7 +28,6 @@ const navItems = [
   { href: '/admin/trusted-partners', label: 'Mitra & brand', icon: Handshake },
   { href: '/admin/portfolio', label: 'Portfolio', icon: Layers },
   { href: '/admin/about', label: 'Tentang', icon: Info },
-  { href: '/admin/careers', label: 'Karier', icon: Users },
   { href: '/admin/team', label: 'Tim Admin', icon: ShieldCheck },
   { href: '/admin/account', label: 'Akun Saya', icon: UserCog },
 ];

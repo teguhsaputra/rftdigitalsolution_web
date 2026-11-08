@@ -1,5 +1,5 @@
 /**
- * Hanya seed layanan, portfolio, tentang, dan karier (tanpa post blog).
+ * Hanya seed layanan, portfolio, dan tentang (tanpa post blog).
  * Pakai: npm run db:seed:marketing
  */
 import { config } from 'dotenv';
@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await seedMarketingContent(prisma);
-  console.log('Seed marketing: tentang, layanan, portfolio, dan karier disinkronkan ke database.');
+  console.log('Seed marketing: tentang, layanan, portfolio, dan mitra disinkronkan ke database.');
 }
 
 main()

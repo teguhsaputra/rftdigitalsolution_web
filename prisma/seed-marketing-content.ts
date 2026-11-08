@@ -1,7 +1,6 @@
 import type { PrismaClient } from '@prisma/client';
 import {
   aboutContent,
-  careerOpenings,
   coreServices,
   legacyPortfolioSlugs,
   portfolioProjects,
@@ -11,7 +10,7 @@ import { ABOUT_PAGE_ID } from '../lib/public-content';
 import { BRAND_SETTINGS_ID, DEFAULT_WHATSAPP_MESSAGE, LEGACY_LOGO_SRCS } from '../lib/brand';
 
 /**
- * Seed / upsert: About (satu dokumen), Layanan, Portfolio, Mitra, Karier.
+ * Seed / upsert: About (satu dokumen), Layanan, Portfolio, Mitra.
  * Dipakai oleh `prisma/seed.ts` dan skrip `npm run db:seed:marketing`.
  */
 export async function seedMarketingContent(prisma: PrismaClient) {
@@ -117,31 +116,5 @@ export async function seedMarketingContent(prisma: PrismaClient) {
       });
     }
     sort++;
-  }
-
-  sort = 0;
-  for (const c of careerOpenings) {
-    await prisma.careerOpening.upsert({
-      where: { slug: c.slug },
-      create: {
-        slug: c.slug,
-        title: c.title,
-        location: c.location,
-        type: c.type,
-        description: c.description,
-        responsibilities: c.responsibilities,
-        sortOrder: sort++,
-        published: true,
-      },
-      update: {
-        title: c.title,
-        location: c.location,
-        type: c.type,
-        description: c.description,
-        responsibilities: c.responsibilities,
-        sortOrder: sort - 1,
-        published: true,
-      },
-    });
   }
 }

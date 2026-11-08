@@ -103,6 +103,7 @@ model AboutPage {
   updatedAt DateTime @updatedAt
 }
 
+/// Tidak dipakai lagi (fitur karier dihapus). Dibiarkan agar `prisma db push` tidak men-drop tabel lama.
 model CareerOpening {
   id               String   @id @default(cuid())
   slug             String   @unique

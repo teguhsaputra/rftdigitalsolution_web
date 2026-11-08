@@ -82,7 +82,7 @@ async function main() {
   await seedMarketingContent(prisma);
 
   console.log(`Seed: ${samplePosts.length} artikel blog (dummy) siap dipublikasikan.`);
-  console.log('Seed: layanan, portfolio, mitra, tentang, dan karier disinkronkan ke database.');
+  console.log('Seed: layanan, portfolio, mitra, dan tentang disinkronkan ke database.');
 }
 
 main()

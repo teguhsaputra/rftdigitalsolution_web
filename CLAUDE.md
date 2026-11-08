@@ -16,7 +16,7 @@ npm test                     # Vitest unit tests (lib/**/__tests__); single file
 
 npm run db:push              # prisma db push — the project uses push, there is no prisma/migrations folder
 npm run db:seed              # prisma/seed.ts (blog posts)
-npm run db:seed:marketing    # prisma/seed-marketing.ts (services, portfolio, careers, about…)
+npm run db:seed:marketing    # prisma/seed-marketing.ts (services, portfolio, partners, about…)
 npm run db:studio
 
 npm run admin:create -- --email a@b.com --name "Nama"   # create/reset an admin account (prompts for password, or ADMIN_PASSWORD env)
@@ -31,8 +31,8 @@ Local infra (Postgres on host port **15432**, Redis, MinIO) runs via `docker-com
 ## Architecture
 
 **Route groups**
-- `app/(public)/` — one-page landing (`page.tsx`) + `/blog`, `/privacy`, `/terms`. The layout (`force-dynamic`) renders the announcement bar, floating navbar, closing section/footer and floating WhatsApp CTA. Landing sections live in `components/landing/` (one file per section, anchors `#layanan`, `#portofolio`, `#harga`, `#tentang`, `#blog`, `#faq`, `#kontak`); static copy lives in `lib/landing-copy.ts`. Old routes `/about`, `/services`, `/projects`, `/contact` are 308 redirects to those anchors in `next.config.ts`; `/career` redirects to `/` (the careers section is currently not shown publicly; admin careers and data remain).
-- `app/admin/` — CMS pages (posts, services, portfolio, careers, trusted partners, about, brand). Each entity follows the same pattern: list page + `new/` + `[id]/` pages, backed by `components/admin-*-editor.tsx` / `admin-*-table.tsx` and a REST route in `app/api/admin/<entity>/` (`route.ts` for list/create, `[id]/route.ts` for update/delete).
+- `app/(public)/` — one-page landing (`page.tsx`) + `/blog`, `/privacy`, `/terms`. The layout (`force-dynamic`) renders the announcement bar, floating navbar, closing section/footer and floating WhatsApp CTA. Landing sections live in `components/landing/` (one file per section, anchors `#layanan`, `#portofolio`, `#harga`, `#tentang`, `#blog`, `#faq`, `#kontak`); static copy lives in `lib/landing-copy.ts`. Old routes `/about`, `/services`, `/projects`, `/contact` are 308 redirects to those anchors in `next.config.ts`; `/career` redirects to `/` (the careers feature was removed; the unused `CareerOpening` table is kept in the schema so `db push` never drops data).
+- `app/admin/` — CMS pages (posts, services, portfolio, trusted partners, about, brand, team, account). Each entity follows the same pattern: list page + `new/` + `[id]/` pages, backed by `components/admin-*-editor.tsx` / `admin-*-table.tsx` and a REST route in `app/api/admin/<entity>/` (`route.ts` for list/create, `[id]/route.ts` for update/delete).
 - `app/api/upload/presigned/` — returns a MinIO presigned PUT URL; the browser uploads directly (`components/image-upload.tsx`).
 
 **Auth** (`auth.config.ts`, `auth.ts`, `proxy.ts`, `lib/admin-auth.ts`, `types/next-auth.d.ts`)
