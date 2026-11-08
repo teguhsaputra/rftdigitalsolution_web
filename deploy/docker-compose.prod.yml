@@ -5,8 +5,8 @@
 # Tidak ada port yang dibuka ke internet. Kredensial S3 (user `rft`, hanya bisa akses bucket-nya sendiri)
 # dibuat dengan /opt/native-apps/minio/add-project.sh dan disimpan di .env.
 #
-# Database: Postgres BERSAMA di VPS (container `smartles_db`, project smartles) — JANGAN tambah Postgres baru.
-# RFT memakai role `rft` + database `rft_blog` di sana, dicapai lewat jaringan Docker `smartles_internal`.
+# Database: Postgres BERSAMA di VPS (container `postgres`, /opt/native-apps/postgres) — JANGAN tambah Postgres baru.
+# RFT memakai role `rft` + database `rft_blog` di sana, dicapai lewat jaringan Docker `db`.
 # .env: POSTGRES_USER=rft, POSTGRES_PASSWORD=<password role rft>, POSTGRES_DB=rft_blog.
 #
 #   docker compose -f deploy/docker-compose.prod.yml --env-file .env up -d --build
@@ -33,7 +33,7 @@ services:
       AUTH_URL: ${AUTH_URL:?isi AUTH_URL}
       NEXTAUTH_URL: ${AUTH_URL}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-${AUTH_URL}}
-      DATABASE_URL: postgresql://${POSTGRES_USER:?isi POSTGRES_USER}:${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD}@smartles_db:5432/${POSTGRES_DB:?isi POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?isi POSTGRES_USER}:${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:?isi POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@cache:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:?isi REDIS_PASSWORD}
       S3_ENDPOINT: ${S3_ENDPOINT:?isi S3_ENDPOINT}
@@ -62,7 +62,7 @@ services:
     volumes:
       - ..:/app
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:?isi POSTGRES_USER}:${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD}@smartles_db:5432/${POSTGRES_DB:?isi POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?isi POSTGRES_USER}:${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:?isi POSTGRES_DB}
       NODE_ENV: development
     networks: [shared-db]
     command: sh -c "npm ci && npx prisma generate && npx prisma db push"
@@ -71,7 +71,7 @@ networks:
   internal:
   proxy:
     external: true
-  # Jaringan internal project smartles, tempat Postgres bersama (smartles_db) berada.
+  # Postgres bersama (/opt/native-apps/postgres)
   shared-db:
     external: true
-    name: smartles_internal
+    name: db
