@@ -1,11 +1,12 @@
 # Produksi di VPS Tencent Jakarta (43.173.51.136), folder /opt/native-apps/rftdigitalsolution_web.
-# HTTPS ditangani Caddy bersama (/opt/native-apps/caddy) lewat jaringan Docker eksternal `proxy`:
-#   rftdigitalsolution.com    -> native_rft_web:3000
-#   s3.rftdigitalsolution.com -> minio:9000   (MinIO BERSAMA di /opt/native-apps/minio, bucket rft-blog-images)
+# Infra bersama (Caddy, Postgres, MinIO) dikelola repo github.com/teguhsaputra/tencent-infra
+# (di server: /opt/native-apps/infra). Domain diatur di caddy/sites/rftdigitalsolution.caddy di repo itu:
+#   rftdigitalsolution.com    -> native_rft_web:3000   (lewat jaringan Docker eksternal `proxy`)
+#   s3.rftdigitalsolution.com -> minio:9000            (MinIO bersama, bucket rft-blog-images)
 # Tidak ada port yang dibuka ke internet. Kredensial S3 (user `rft`, hanya bisa akses bucket-nya sendiri)
-# dibuat dengan /opt/native-apps/minio/add-project.sh dan disimpan di .env.
+# dibuat dengan scripts/add-minio.sh di tencent-infra dan disimpan di .env.
 #
-# Database: Postgres BERSAMA di VPS (container `postgres`, /opt/native-apps/postgres) — JANGAN tambah Postgres baru.
+# Database: Postgres BERSAMA dari tencent-infra (container `postgres`) — JANGAN tambah Postgres baru.
 # RFT memakai role `rft` + database `rft_blog` di sana, dicapai lewat jaringan Docker `db`.
 # .env: POSTGRES_USER=rft, POSTGRES_PASSWORD=<password role rft>, POSTGRES_DB=rft_blog.
 #
@@ -73,7 +74,7 @@ networks:
   internal:
   proxy:
     external: true
-  # Postgres bersama (/opt/native-apps/postgres)
+  # Postgres bersama (tencent-infra)
   shared-db:
     external: true
     name: db
